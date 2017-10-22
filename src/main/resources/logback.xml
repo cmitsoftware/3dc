@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true" scanPeriod="30 seconds">
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} %-5level %logger{36} - %msg%n
+			</Pattern>
+		</encoder>
+	</appender>
+
+	<if condition='"develop".equals(property("PLATFORM"))'>
+        <then>
+            <property name="LOG_LEVEL" value="DEBUG"/>
+            <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		       	<file>C:\temp\3dc.log</file>
+				<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+					<Pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+					</Pattern>
+				</encoder>
+		
+		        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+		            <FileNamePattern>C:\temp\3dc.log.%i.log</FileNamePattern>
+		            <MinIndex>1</MinIndex>
+		            <MaxIndex>10</MaxIndex>
+		        </rollingPolicy>
+		
+		        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+		            <MaxFileSize>2MB</MaxFileSize>
+		        </triggeringPolicy>
+		   	</appender>
+        </then>
+        <else>
+            <property name="LOG_LEVEL" value="INFO"/>
+        </else>
+    </if>
+	
+	<logger name="org.hibernate" level="INFO" />
+	<logger name="org.springframework" level="INFO" />
+	<logger name="org.springframework.security" level="INFO" />
+    <logger name="org.climbing" level="${LOG_LEVEL}" />
+
+	<!-- 
+	<logger name="org.springframework.web.servlet.i18n.SessionLocaleResolver" level="DEBUG" />
+	<logger name="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" level="DEBUG" />
+	<logger name="org.springframework.context.support.ResourceBundleMessageSource" level="DEBUG" />
+	 -->
+
+	<root level="INFO">
+		<if condition='"develop".equals(property("PLATFORM"))'>
+			<then><appender-ref ref="FILE" /></then>
+		</if>
+		<appender-ref ref="STDOUT" />
+	</root>
+
+</configuration>

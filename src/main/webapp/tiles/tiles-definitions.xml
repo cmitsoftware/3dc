@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+	<definition name="3dc.home" template="/tiles/template/base.jsp">
+		<put-attribute name="head" value="/tiles/standard/head.jsp" />
+		<put-attribute name="footer" value="/tiles/standard/footer.jsp" />
+		<put-attribute name="lateLoadScripts" value="/tiles/standard/lateLoadScripts.jsp" />
+	</definition>
+	
+</tiles-definitions>
