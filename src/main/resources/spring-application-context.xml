@@ -90,7 +90,7 @@
 	</bean>
 	
 	<!-- Load properties to be used in jsp -->
-	<util:properties id="propertyConfigurer" location="classpath:${PLATFORM}-3dc.properties"/>
+	<util:properties id="propertyConfigurer" location="file:${PROPERTIES_PATH}/3dc.properties"/>
     <context:property-placeholder properties-ref="applicationProperties" />
 
 </beans>
