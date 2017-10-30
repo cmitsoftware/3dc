@@ -113,6 +113,12 @@
 			<groupId>org.apache.tiles</groupId>
 			<artifactId>tiles-extras</artifactId>
 			<version>3.0.7</version>
+			<exclusions>
+			    <exclusion>
+			      	<groupId>jboss</groupId>
+			      	<artifactId>javassist</artifactId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 		
 		<!-- Spring security -->

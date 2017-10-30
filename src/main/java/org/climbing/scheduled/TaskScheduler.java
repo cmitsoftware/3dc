@@ -123,26 +123,26 @@ public class TaskScheduler {
 	    System.out.println("Sending report email " + now);
 	}
 	
-	@Scheduled(cron="0 0 * * * *")
-	public void keepAlive() {
-		
-		HttpClient client = HttpClientBuilder.create().build();
-		
-		String keepAliveUrl = configurationsDao.findByKey("keep.alive.url").getValue();
-		System.out.println("Keep alive url: " + keepAliveUrl);
-		
-//		HttpGet request = new HttpGet("http://gym-3dclimbing.rhcloud.com");
-		HttpGet request = new HttpGet(keepAliveUrl);
-
-		// add request header
-		HttpResponse response;
-		try {
-			response = client.execute(request);
-			System.out.println("Keep alive response Code : " 
-					+ response.getStatusLine().getStatusCode());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	@Scheduled(cron="0 0 * * * *")
+//	public void keepAlive() {
+//		
+//		HttpClient client = HttpClientBuilder.create().build();
+//		
+//		String keepAliveUrl = configurationsDao.findByKey("keep.alive.url").getValue();
+//		System.out.println("Keep alive url: " + keepAliveUrl);
+//		
+////		HttpGet request = new HttpGet("http://gym-3dclimbing.rhcloud.com");
+//		HttpGet request = new HttpGet(keepAliveUrl);
+//
+//		// add request header
+//		HttpResponse response;
+//		try {
+//			response = client.execute(request);
+//			System.out.println("Keep alive response Code : " 
+//					+ response.getStatusLine().getStatusCode());
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 }
