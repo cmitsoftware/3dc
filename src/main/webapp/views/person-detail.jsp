@@ -29,6 +29,23 @@
 
 			<!-- Main content -->
    			<section class="content">
+   			
+   				<div class="row" style="margin-bottom:10px;">
+		    		<div class="col-xs-12 col-sm-12 col-md-12">
+		    			<div class="btn-group">
+							<button type="button" class="btn btn-primary"
+								onclick="$('#person-form').submit()">
+								Salva
+							</button>
+							<button type="button" class="btn btn-primary"
+								onclick="location.href='${pageContext.servletContext.contextPath}/persons?reload=true'">
+								Indietro
+							</button>
+						</div>
+			   		</div>
+					<!-- <div class="col-xs-0 col-sm-8 col-md-10"></div> -->
+				</div>
+   			
        			<form id="person-form" method="post"
         			action="${pageContext.servletContext.contextPath}/persons?method=save">
    					<div class="row">
@@ -39,15 +56,12 @@
 	              						Climber n. <input id="number" name="number" type="text" class=""
 	              							style="width: 50px;text-align: right;margin-left: 7px;" 
 	              							value="${person.number}">
-	              						<%-- <c:choose>
-	              							<c:when test="${empty person.id}">
-	              								Nuovo climber
-	              							</c:when>
-	              							<c:otherwise>
-	              								Climber n. <strong>${person.number}</strong>
-	              							</c:otherwise>	
-	              						</c:choose> --%>
 	              					</h4>
+	              					<c:if test="${empty person.number}">
+		              					<h4>Associa numero automaticamente
+											<input id="generateNumber" name="generateNumber" type="checkbox" style="margin-left: 5px;">
+										</h4>
+									</c:if>
 		            			</div>
 		            			<div class="box-body">
 		            				<input name="id" type="hidden" value="${person.id}">
@@ -189,7 +203,7 @@
 								Salva
 							</button>
 							<button type="button" class="btn btn-primary"
-								onclick="location.href='${pageContext.servletContext.contextPath}/persons'">
+								onclick="location.href='${pageContext.servletContext.contextPath}/persons?reload=true'">
 								Indietro
 							</button>
 						</div>

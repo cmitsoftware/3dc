@@ -54,7 +54,7 @@ public class PersonDAO extends BaseHibernateDAO{
     public Person save(Person transientInstance) {
 		log.debug("saving Person instance");
 		try {
-			getSession().save(transientInstance);
+			getSession().saveOrUpdate(transientInstance);
 			log.debug("save successful");
 		} catch (RuntimeException re) {
 			log.error("save failed", re);
@@ -138,7 +138,7 @@ public class PersonDAO extends BaseHibernateDAO{
     
     public Long searchCount(String searchToken) {
 	    
-    	if(!StringUtils.isEmpty(searchToken)) {
+//    	if(!StringUtils.isEmpty(searchToken)) {
     		DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
     		
     		Disjunction filter = Restrictions.disjunction();
@@ -153,8 +153,8 @@ public class PersonDAO extends BaseHibernateDAO{
     		}
     		
     		return (long)getCount(dc);
-    	}
-    	return (long)0;
+//    	}
+//    	return (long)0;
     }
 
 	public Integer getNextNumber() {
@@ -170,12 +170,28 @@ public class PersonDAO extends BaseHibernateDAO{
 		
 	}
 
-	public List<Person> findMailingPersons() {
+	public List<Person> findMailingAll() {
 		
 		DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
     	dc.add(Restrictions.eq("mailing", true));
     	dc.add(Restrictions.isNotNull("email"));
-    	dc.add(Restrictions.like("email", "@"));
+    	dc.add(Restrictions.like("email", "%@%"));
+    	
+    	return findByCriteria(dc);
+		
+	}
+	
+	public List<Person> findMailingRegistered() {
+		
+		Calendar yearStart = Calendar.getInstance();
+		yearStart.set(Calendar.MONTH, 0);
+		yearStart.set(Calendar.DAY_OF_MONTH, 0);
+		
+		DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
+    	dc.add(Restrictions.eq("mailing", true));
+    	dc.add(Restrictions.isNotNull("email"));
+    	dc.add(Restrictions.like("email", "%@%"));
+    	dc.add(Restrictions.ge("registrationDate", yearStart.getTime()));
     	
     	return findByCriteria(dc);
 		

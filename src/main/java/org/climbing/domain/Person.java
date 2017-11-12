@@ -33,12 +33,18 @@ public class Person implements java.io.Serializable {
 	private String email;
 	private String cf;
 	private Date birthDate;
+	//Data iscrizione
 	private Date registrationDate;
+	//Data abbonamento
 	private Date subscriptionDate;
+	//Data certificato medico
 	private Date certificationDate;
+	//Data affiliazione
 	private Date affiliationDate;
+	//Data prova gratuita
 	private Date freeEntryDate;
 	private Boolean mailing;
+	//Data creazione anagrafica
 	private Date creationDate;
 	private Integer number;
 

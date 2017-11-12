@@ -73,19 +73,36 @@
   	<tiles:putAttribute name="footer" value="/tiles/standard/footer.jsp"/>
 
 	<tiles:putAttribute name="lateLoadScripts" value="/tiles/standard/lateLoadScripts.jsp"/>
-
 	<tiles:putAttribute name="pageScripts">
 		<script type="text/javascript">
 			var personsTable;
 			$(document).ready(function(){
-				//alert("ok");
+				
+				var pageLength = 50;
+				if(localStorage.getItem('personListLength') != null) {
+					pageLength = parseInt(localStorage.getItem('personListLength'));
+				} else {
+					localStorage.setItem('personListLength', pageLength);
+				}
+				
+				var displayStart = 0;
 				personsTable = $("#persons-table").DataTable({
 					"processing": true,
 	       			"serverSide": true,
 	       			"responsive": true,
-	       			"pageLength": 50,
+	       			"stateSave": true,
+	       			"pageLength": pageLength,
+	       			"displayStart": displayStart,
 	       			"lengthMenu": [5, 10, 50, 100],
 	       			"dom": "frtpl",
+	       			"stateLoadParams": 
+	       				function( settings, data ) {
+	       					<c:if test="${empty param.reload}">
+	       						if (data.order) delete data.order;
+	       						if (data.search) delete data.search;
+	       						if (data.start) delete data.start;
+	       					</c:if>
+	       			 	},
 	       			"ajax": {
 	        			"url": "${pageContext.request.contextPath}/persons?method=search"
 	       			},

@@ -52,14 +52,18 @@ public class MailingController {
 		String type = request.getParameter("type");
 		
 		List<String> toListCCN = new ArrayList<String>();
-		if("all".equals(type)) {
-//			String env = configurationsDao.findByKey("env").getValue();
+		if(!"test".equals(type)) {
 			String env = System.getProperty("PLATFORM");
 			String testEnvAllDest = configurationsDao.findByKey("mailing.test.env.to").getValue();
-			List<Person> persons = personDao.findMailingPersons();
-			if("dev".equals(env) || "test".equals(env)) {
+			if("develop".equals(env) || "test".equals(env)) {
 				toListCCN.add(testEnvAllDest);
 			} else {
+				List<Person> persons = new ArrayList<Person>();
+				if("all".equals(type)) {
+					persons = personDao.findMailingAll();
+				} else {
+					persons = personDao.findMailingRegistered();
+				}
 				for(Person p: persons) {
 					Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(p.getEmail());
 					/*
@@ -85,7 +89,6 @@ public class MailingController {
 		
 		String result = "Email inviata a " + toListCCN.size() + " indirizzi";
 		try {
-			
 			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
 			
 		} catch (Exception e) {

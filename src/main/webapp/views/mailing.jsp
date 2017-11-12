@@ -47,7 +47,8 @@
 			            			</div>
 			            			<div class="box-footer">
 					                	<button type="submit" mailing-type="test" class="btn btn-primary mailing-form-submit">Invia mail di test</button>
-					                	<button type="submit" mailing-type="all" class="btn btn-warning mailing-form-submit">Invia mailing</button>
+					                	<button type="submit" mailing-type="all" class="btn btn-warning mailing-form-submit">Invia a tutti i climber</button>
+					                	<button type="submit" mailing-type="subscribed" class="btn btn-success mailing-form-submit">Invia a tutti gli iscritti dell'anno corrente</button>
 					              	</div>
 	            				</c:when>
 								<c:otherwise>
@@ -115,7 +116,23 @@
 					$("#mailing-type").val($(this).attr("mailing-type"));
 					if($("#mailing-type").val() == "test") {
 						$("#mailing-form").submit();
-					} else {
+					} else if($("#mailing-type").val() == "all") {
+						var n = noty({
+							text: "Inviare la mail a tutti i climber?",
+		       				layout: "center",
+		       				theme: "climbing",
+		       				modal: true,
+		       				type: "notification",
+		       				buttons: [
+								{addClass: "btn btn-primary", text: "Si", 
+									onClick: function($noty) {
+										$("#mailing-form").submit();
+									}
+								},
+								{addClass: "btn btn-danger", text: "No", onClick: function($noty) {$noty.close();}}
+							]
+		       			});
+					} else if($("#mailing-type").val() == "subscribed") {
 						var n = noty({
 							text: "Inviare la mail a tutti gli iscritti?",
 		       				layout: "center",

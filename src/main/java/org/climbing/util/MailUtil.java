@@ -98,7 +98,7 @@ public class MailUtil {
 			email.setMsg(message);
 	        email.setHtmlMsg(mailBody);
 	        
-//	        email.send();
+	        email.send();
 	        
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -67,7 +67,7 @@ public class PersonController {
 			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("message", "Errore nell'eliminare il climber. chiama gianni");
 		}
-		return "redirect:/persons";
+		return "redirect:/persons?reload=true";
 	}
 	
 	@Transactional
@@ -88,6 +88,7 @@ public class PersonController {
 			/*
 			 * Get the next available number only if it is a new climber and number is not specified
 			 */
+			System.out.println(request.getParameter("generateNumber"));
 			Integer number;
 			if(!StringUtils.isEmpty(request.getParameter("number"))) {
 				try {
@@ -97,7 +98,7 @@ public class PersonController {
 					System.out.println("Cannot convert number: " + request.getParameter("number"));
 				}
 			} else {
-				if(StringUtils.isEmpty(request.getParameter("id"))){
+				if(!StringUtils.isEmpty(request.getParameter("generateNumber"))){
 					number = personDao.getNextNumber() + 1;
 					person.setNumber(number);
 				}
@@ -183,7 +184,7 @@ public class PersonController {
 
 			e.printStackTrace();
 			PersonSearchResult res = new PersonSearchResult();
-			res.setError("Errore. Dai la colpa a gianni");
+			res.setError("Errore. Colpa di gianni");
 			return new ResponseEntity<PersonSearchResult>(res, HttpStatus.OK);
 		}
 	}
