@@ -8,21 +8,21 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.climbing.domain.Person;
 import org.climbing.repo.ConfigurationsDAO;
 import org.climbing.repo.PersonDAO;
 import org.climbing.util.MailUtil;
 import org.climbing.util.ReportUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TaskScheduler {
+	
+	private static final Logger log = LoggerFactory.getLogger(TaskScheduler.class);
 
 	@Autowired
 	MailUtil mailUtil;
@@ -36,13 +36,11 @@ public class TaskScheduler {
 	@Autowired
 	PersonDAO personDao;
 	
-//	@Scheduled(cron="0 0 0/1 1/1 * ?")
-//	@Scheduled(cron="0 0 10 1 * ?") // In prod ogni 1 del mese alle 10
 	@Scheduled(cron="${report.mail.cron}")
 	public void reportPersonsWithoutCertificate()
 	{
 		Date now = new Date();
-		System.out.println("Generating report at " + now);
+		log.info("Generating report");
 		
 		byte[] report = reportUtil.buildPersonsReport();
 		
@@ -120,7 +118,7 @@ public class TaskScheduler {
 		mailUtil.sendMail(fromEmail, fromName, to, cc, bcc, "Report mensile iscritti " + sdf.format(now),
 				message, attachments, mimeTypes, false);		
 		
-	    System.out.println("Sending report email " + now);
+	    log.info("Sending report email");
 	}
 	
 //	@Scheduled(cron="0 0 * * * *")

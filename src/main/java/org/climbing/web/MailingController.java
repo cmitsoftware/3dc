@@ -13,6 +13,8 @@ import org.climbing.domain.Person;
 import org.climbing.repo.ConfigurationsDAO;
 import org.climbing.repo.PersonDAO;
 import org.climbing.util.MailUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +27,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping(value="/mailing")
 public class MailingController {
 
+	private static final Logger log = LoggerFactory.getLogger(MailingController.class);
+	
 	public static final Pattern VALID_EMAIL_ADDRESS_REGEX = 
 		    Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 	
@@ -70,10 +74,10 @@ public class MailingController {
 					 * Only valid emails
 					 */
 			        if(matcher.find()) {
-			        	System.out.println("Sending mailing to " + p.getEmail() + " :" + p.getName() + " " + p.getSurname());
+			        	log.debug("Sending mailing to {} : {} {} ", p.getEmail(), p.getName(), p.getSurname());
 			        	toListCCN.add(p.getEmail());
 			        } else {
-			        	System.out.println("Email not valid: " + p.getEmail());
+			        	log.warn("Email not valid: {}", p.getEmail());
 			        }
 				}
 			}
@@ -93,7 +97,7 @@ public class MailingController {
 			
 		} catch (Exception e) {
 			
-			System.out.println("Cannot send mailing");
+			log.info("Cannot send mailing");
 			e.printStackTrace();
 			result = "Errore nell'invio della mail";
 		}

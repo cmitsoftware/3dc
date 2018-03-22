@@ -13,6 +13,8 @@ import org.climbing.repo.PersonDAO;
 import org.climbing.security.ClimbingUserDetails;
 import org.climbing.web.obj.PersonObj;
 import org.climbing.web.obj.PersonSearchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping(value="/persons")
 public class PersonController {
 
+	private static final Logger log = LoggerFactory.getLogger(PersonController.class);
+	
 	private String[] personsTableColumn = {"number", "name", "surname", "registrationDate", "subscriptionDate", "certificationDate", "freeEntryDate"};
 
 	@Autowired
@@ -88,14 +92,14 @@ public class PersonController {
 			/*
 			 * Get the next available number only if it is a new climber and number is not specified
 			 */
-			System.out.println(request.getParameter("generateNumber"));
+			log.debug(request.getParameter("generateNumber"));
 			Integer number;
 			if(!StringUtils.isEmpty(request.getParameter("number"))) {
 				try {
 					number = Integer.parseInt(request.getParameter("number"));
 					person.setNumber(number);
 				} catch (Exception e) {
-					System.out.println("Cannot convert number: " + request.getParameter("number"));
+					log.error("Cannot convert number: {}", request.getParameter("number"));
 				}
 			} else {
 				if(!StringUtils.isEmpty(request.getParameter("generateNumber"))){
