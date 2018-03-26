@@ -56,11 +56,26 @@ public class MailingController {
 		String type = request.getParameter("type");
 		
 		List<String> toListCCN = new ArrayList<String>();
-		if(!"test".equals(type)) {
+		List<String> alreadySent = new ArrayList<String>();
+		String fromEmail = configurationsDao.findByKey("smtp.default.from.email").getValue();
+		String fromName = configurationsDao.findByKey("smtp.default.from.name").getValue();
+		Integer mailingBatchSize = Integer.parseInt(configurationsDao.findByKey("mailing.batch.size").getValue());;
+		
+		String result = "";
+		if(!"recipients".equals(type)) {
 			String env = System.getProperty("PLATFORM");
 			String testEnvAllDest = configurationsDao.findByKey("mailing.test.env.to").getValue();
 			if("develop".equals(env) || "test".equals(env)) {
 				toListCCN.add(testEnvAllDest);
+				try {
+        			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
+        			result = "Email inviata a " + toListCCN.size() + " indirizzi";
+        		} catch (Exception e) {
+        			
+        			log.info("Cannot send mailing: {}", e.getMessage());
+        			e.printStackTrace();
+        			
+        		}
 			} else {
 				List<Person> persons = new ArrayList<Person>();
 				if("all".equals(type)) {
@@ -68,39 +83,59 @@ public class MailingController {
 				} else {
 					persons = personDao.findMailingRegistered();
 				}
-				for(Person p: persons) {
+				
+				List<String> sent = new ArrayList<String>(); 
+				for(int i = 0; i < persons.size(); i++) {
+					Person p = persons.get(i);
 					Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(p.getEmail());
 					/*
 					 * Only valid emails
 					 */
 			        if(matcher.find()) {
 			        	log.debug("Sending mailing to {} : {} {} ", p.getEmail(), p.getName(), p.getSurname());
-			        	toListCCN.add(p.getEmail());
+			        	if(!alreadySent.contains(p.getEmail())) {
+			        		toListCCN.add(p.getEmail());
+			        		alreadySent.add(p.getEmail());
+			        		
+			        	}
 			        } else {
 			        	log.warn("Email not valid: {}", p.getEmail());
 			        }
+			        
+			        if(toListCCN.size() == mailingBatchSize || ((i == persons.size()-1) && toListCCN.size() > 0)) {
+			        	try {
+		        			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
+		        			sent.addAll(toListCCN);
+		        		} catch (Exception e) {
+		        			
+		        			log.info("Cannot send mailing: {}", e.getMessage());
+		        			e.printStackTrace();
+		        			
+		        		}
+			        	toListCCN = new ArrayList<>();
+			        }
 				}
+				result = "Email inviata a " + sent.size() + " indirizzi (su " + alreadySent.size() + " totali)";
 			}
 		} else {
-			String tos = configurationsDao.findByKey("mailing.test.to").getValue();
-			if(tos != null) {
-				toListCCN = Arrays.asList(tos.split("\\,"));
+			
+			String recipients = request.getParameter("recipients");
+			if(recipients != null) {
+				toListCCN = Arrays.asList(recipients.split("\\,"));
+				alreadySent.addAll(toListCCN);
 			}
+			try {
+    			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
+    			
+    			result = "Email inviata a " + alreadySent.size() + " indirizzi";
+    		} catch (Exception e) {
+    			
+    			log.info("Cannot send mailing: {}", e.getMessage());
+    			e.printStackTrace();
+    			result = "Errore nell'invio";
+    		}
 		}
 		
-		String fromEmail = configurationsDao.findByKey("smtp.default.from.email").getValue();
-		String fromName = configurationsDao.findByKey("smtp.default.from.name").getValue();
-		
-		String result = "Email inviata a " + toListCCN.size() + " indirizzi";
-		try {
-			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
-			
-		} catch (Exception e) {
-			
-			log.info("Cannot send mailing");
-			e.printStackTrace();
-			result = "Errore nell'invio della mail";
-		}
 		
 		redirectAttributes.addAttribute("result", result);
         return "redirect:/mailing";

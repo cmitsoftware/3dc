@@ -39,7 +39,7 @@ public class ReportUtil {
 	        int colOffset = 0;
 	        Row titlesRow = sheetsData.createRow((short)rowOffset);
 	        Cell title1Cell = titlesRow.createCell(colOffset);
-	        title1Cell.setCellValue("Id");
+	        title1Cell.setCellValue("N.");
 	        title1Cell.setCellStyle(titlesStyle);
 	        
 	        colOffset++;
@@ -118,7 +118,10 @@ public class ReportUtil {
 	        	colOffset = 0;
 		        Row personRow = sheetsData.createRow((short)rowOffset);
 		        Cell cell1 = personRow.createCell(colOffset);
-		        cell1.setCellValue(p.getId());
+//		        cell1.setCellValue(p.getId());
+		        if(p.getNumber() != null) {
+		        	cell1.setCellValue(p.getNumber());
+		        }
 		        
 		        colOffset++;
 		        Cell cell2 = personRow.createCell(colOffset);
@@ -219,7 +222,7 @@ public class ReportUtil {
 	        int colOffset = 0;
 	        Row titlesRow = sheetsData.createRow((short)rowOffset);
 	        Cell title1Cell = titlesRow.createCell(colOffset);
-	        title1Cell.setCellValue("Id");
+	        title1Cell.setCellValue("N.");
 	        title1Cell.setCellStyle(titlesStyle);
 	        
 	        colOffset++;
@@ -298,7 +301,10 @@ public class ReportUtil {
 	        	colOffset = 0;
 		        Row personRow = sheetsData.createRow((short)rowOffset);
 		        Cell cell1 = personRow.createCell(colOffset);
-		        cell1.setCellValue(p.getId());
+//		        cell1.setCellValue(p.getId());
+		        if(p.getNumber() != null) {
+		        	cell1.setCellValue(p.getNumber());
+		        }
 		        
 		        colOffset++;
 		        Cell cell2 = personRow.createCell(colOffset);

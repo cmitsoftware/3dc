@@ -32,21 +32,19 @@
 							                  	<label>Oggetto</label>
 							                  	<input id="mailing-subject" type="text" class="form-control" name="subject"/>
 							                </div>
-							                <!-- <div class="form-group">
-							                  	<label>Testo della mail</label>
-							                  	<textarea id="mailing-text" class="form-control" rows="4" name="text"></textarea>
-							                </div> -->
-<!-- 											<div class="box-body pad"> -->
 											<div class="form-group">
 												<label>Corpo della mail</label>
 								                <textarea id="mailing-text" name="text"  class="textarea" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
 								            </div>
-<!-- 								            </div> -->
-							                <input id="mailing-type" type="hidden" value="test" name="type"/>
+											<div class="form-group">
+							                  	<label>Destinatari (separati da virgola)</label>
+							                  	<input id="mailing-recipients" type="text" class="form-control" name="recipients"/>
+							                </div>
+							                <input id="mailing-type" type="hidden" value="recipients" name="type"/>
 		            					</form>
 			            			</div>
 			            			<div class="box-footer">
-					                	<button type="submit" mailing-type="test" class="btn btn-primary mailing-form-submit">Invia mail di test</button>
+					                	<button type="submit" mailing-type="recipients" class="btn btn-primary mailing-form-submit">Invia mail a indirizzi specificati</button>
 					                	<button type="submit" mailing-type="all" class="btn btn-warning mailing-form-submit">Invia a tutti i climber</button>
 					                	<button type="submit" mailing-type="subscribed" class="btn btn-success mailing-form-submit">Invia a tutti gli iscritti dell'anno corrente</button>
 					              	</div>
@@ -114,8 +112,20 @@
 						return;
 					}
 					$("#mailing-type").val($(this).attr("mailing-type"));
-					if($("#mailing-type").val() == "test") {
-						$("#mailing-form").submit();
+					if($("#mailing-type").val() == "recipients") {
+						if($("#mailing-recipients").val() == "") {
+							var n = noty({
+								text: "Specificare i destinatari",
+			       				layout: "bottom",
+			       				theme: "climbing",
+			       				modal: false,
+			       				timeout: 3000,
+			       				type: "error"
+			       			});
+							return;
+						} else {
+							$("#mailing-form").submit();
+						}
 					} else if($("#mailing-type").val() == "all") {
 						var n = noty({
 							text: "Inviare la mail a tutti i climber?",

@@ -186,7 +186,7 @@
 						        	<div class="form-group col-xs-12 col-md-12 checkbox">
 					                  	<label>
 					                    	<input id="mailing" name="mailing" type="checkbox"
-					                    		<c:if test="${person.mailing eq true}">checked="checked"</c:if>>
+					                    		<c:if test="${person.mailing eq true or empty person.id}">checked="checked"</c:if>>
 					                    		 Riceve le email
 					                  	</label>
 					                </div>

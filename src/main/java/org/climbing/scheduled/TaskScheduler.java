@@ -97,7 +97,10 @@ public class TaskScheduler {
 		for(Person p: personsWithoutCertificate) {
 			message += "<tr>";
 			message += "<td style='border: 1px solid black;padding: 10px;'>";
-			message += p.getId();
+//			message += p.getId();
+			if(p.getNumber() != null) {
+				message += p.getNumber();
+			}
 			message += "</td>";
 			message += "<td style='border: 1px solid black;padding: 10px;'>";
 			message += p.getSurname() != null ? p.getSurname() : "";
