@@ -28,7 +28,7 @@ public class BaseHibernateDAO {
 	}
 	
 	public List findByCriteria(DetachedCriteria detached) {
-		log.debug("find by criteria");
+		log.debug("find by criteria {}", detached.toString());
 		try {
 			Criteria criteria = detached.getExecutableCriteria(sessionFactory.getCurrentSession());
 			return criteria.list();
