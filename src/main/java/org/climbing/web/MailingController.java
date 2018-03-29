@@ -67,9 +67,6 @@ public class MailingController {
 			String testEnvAllDest = configurationsDao.findByKey("mailing.test.env.to").getValue();
 			if("develop".equals(env) || "test".equals(env)) {
 				toListCCN.add(testEnvAllDest);
-				for(String ccn: toListCCN) {
-					log.info("Sending test mailing to {}", ccn);
-				}
 				try {
         			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
         			result = "Email inviata a " + toListCCN.size() + " indirizzi";
@@ -126,6 +123,9 @@ public class MailingController {
 			if(recipients != null) {
 				toListCCN = Arrays.asList(recipients.split("\\,"));
 				alreadySent.addAll(toListCCN);
+				for(String ccn: toListCCN) {
+					log.info("Sending test mailing to {}", ccn);
+				}
 			}
 			try {
     			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);

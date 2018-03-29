@@ -45,6 +45,7 @@ public class MailUtil {
 			HtmlEmail email = new HtmlEmail();
 	        email.setHostName(host);
 	        email.setSmtpPort(port);
+	        email.setCharset("UTF-8");
 	        email.setAuthenticator(new DefaultAuthenticator(username, password));
 	        email.setSSLOnConnect(true);
 			email.setFrom(fromEmail, fromName);
