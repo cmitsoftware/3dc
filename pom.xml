@@ -19,6 +19,21 @@
         <version.mysql>5.1.6</version.mysql>
     </properties>
     
+    <profiles>
+    	<profile>
+			<id>prod</id>
+			<activation>
+	            <property>
+	                <name>env</name>
+	                <value>prod</value>
+	            </property>
+	        </activation>
+	        <properties>
+	            <ant-deploy-target>deploy-prod</ant-deploy-target>
+	        </properties>
+		</profile>
+   	</profiles>
+    
     <dependencies>
 
 		<!-- Jsp -->
@@ -186,7 +201,7 @@
 					<!-- <failOnMissingWebXml>false</failOnMissingWebXml> -->
 				</configuration>
 			</plugin>
-			<!-- <plugin>
+			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.7</version>
 				<dependencies>
@@ -218,7 +233,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin> -->
+			</plugin>
         </plugins>
     </build>
 </project>
