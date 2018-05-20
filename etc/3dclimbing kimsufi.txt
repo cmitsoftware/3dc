@@ -1,0 +1,55 @@
+Creato utente per tomcat
+tomcat
+
+
+JAVA
+wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.tar.gz
+
+
+TOMCAT
+http://it.apache.contactlab.it/tomcat/tomcat-8/v8.5.23/bin/apache-tomcat-8.5.23.tar.gz
+Aggiungere il file setenv.sh in CATALINA_HOME/bin
+Inserire qui la JAVA_HOME e i parametri aggiuntivi della jvm
+JAVA_HOME=/home/tomcat/jdk1.8.0_151
+JAVA_OPTS="-DPLATFORM=production -DPROPERTIES_PATH=\"C:\temp\""
+
+
+MYSQL
+Scaricare il file del repository debian e installarlo
+wget https://dev.mysql.com/get/mysql-apt-config_0.8.3-1_all.deb
+dpkg -i mysql-apt-config_0.8.3-1_all.deb
+apt-get update
+
+Selezionare OK quando chiede i componenti da installare
+
+Scaricare mysql server con apt-get 
+apt-get install -y mysql-server
+
+Viene chiesto di impostare la password di root
+
+E' stato registrato il servizio mysql quindi si può gestire con 
+service mysql start/stop/status
+Per provare il login di root e vedere la versione
+mysqladmin -p -u root version
+
+Connettersi a mysql con 
+mysql -u root -p
+
+Creare l'utente per il database con password 3TZ8pCNy
+CREATE USER 'gym'@'localhost' IDENTIFIED BY '3TZ8pCNy';
+
+Verificare se l'utente viene creato
+select User,Host from mysql.user;
+
+Creare il database gym e dare i permessi all'utente gym
+GRANT SELECT ON gym.* TO 'gym'@'localhost';
+GRANT INSERT ON gym.* TO 'gym'@'localhost';
+GRANT DELETE ON gym.* TO 'gym'@'localhost';
+GRANT UPDATE ON gym.* TO 'gym'@'localhost';
+
+
+Per il deploy via maven + ant
+Scaricare jsch (server per il comando sshexec di ant)
+https://ant.apache.org/manual/install.html#librarydependencies
+
+Scaricare nginx
