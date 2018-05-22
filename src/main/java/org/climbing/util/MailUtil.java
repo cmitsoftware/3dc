@@ -8,16 +8,22 @@ import java.util.Map;
 import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.MultiPartEmail;
 import org.climbing.repo.ConfigurationsDAO;
+import org.climbing.web.MailingController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MailUtil {
+	
+	private static final Logger log = LoggerFactory.getLogger(MailUtil.class);
 
 	@Autowired
 	ReportUtil reportUtil;
@@ -73,6 +79,12 @@ public class MailUtil {
 	        		email.attach(ds, a, a);
 	        	}
 	        }
+	        
+	        log.debug("Sending email as {} using {}:{}", username, host, port);
+	        log.debug("To: {}", StringUtils.join(to, ","));
+	        log.debug("CC: {}", StringUtils.join(cc, ","));
+	        log.debug("BCC: {}", StringUtils.join(bcc, ","));
+	        log.debug("Attachments: {}", StringUtils.join(attachments.keySet(), ","));
 	        
 	        String mailBody = message;
 	        

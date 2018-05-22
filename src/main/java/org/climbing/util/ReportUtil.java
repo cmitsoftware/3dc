@@ -295,7 +295,7 @@ public class ReportUtil {
 	        title15Cell.setCellValue("Data prima registrazione 3D");
 	        title15Cell.setCellStyle(titlesStyle);
 	        
-	        for(Person p: personDao.findPersonsWithoutCertificate()) {
+	        for(Person p: personDao.findPersonsWithoutCertificate(null)) {
 	        	
 	        	rowOffset++;
 	        	colOffset = 0;
