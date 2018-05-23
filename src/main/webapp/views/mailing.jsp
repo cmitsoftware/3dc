@@ -26,7 +26,7 @@
             				<c:choose>
 	            				<c:when test="${empty param.result or param.result eq ''}">
 		            				<div class="box-body">
-		            					<form id="mailing-form" role="form" method="post" 
+		            					<form id="mailing-form" role="form" method="post" enctype="multipart/form-data" 
 		            						action="${pageContext.servletContext.contextPath}/mailing?method=send">
 		            						<div class="form-group">
 							                  	<label>Oggetto</label>
@@ -40,6 +40,13 @@
 							                  	<label>Destinatari (separati da virgola)</label>
 							                  	<input id="mailing-recipients" type="text" class="form-control" name="recipients"/>
 							                </div>
+							                <div class="form-group">
+							                	<label for="mailing-attachment-1">Allegati</label>
+							                  	<input id="mailing-attachment-1" name="mailing-attachment-1" type="file">
+							                  	<input id="mailing-attachment-2" name="mailing-attachment-2" type="file">
+							                  	<input id="mailing-attachment-3" name="mailing-attachment-3" type="file">
+							                </div>
+							                
 							                <input id="mailing-type" type="hidden" value="recipients" name="type"/>
 		            					</form>
 			            			</div>
@@ -47,6 +54,7 @@
 					                	<button type="submit" mailing-type="recipients" class="btn btn-primary mailing-form-submit">Invia mail a indirizzi specificati</button>
 					                	<button type="submit" mailing-type="all" class="btn btn-warning mailing-form-submit">Invia a tutti i climber</button>
 					                	<button type="submit" mailing-type="subscribed" class="btn btn-success mailing-form-submit">Invia a tutti gli iscritti dell'anno corrente</button>
+					                	<button type="submit" mailing-type="subscribed" class="btn btn-danger mailing-form-submit">Invia agli iscritti dell'anno corrente senza certificato</button>
 					              	</div>
 	            				</c:when>
 								<c:otherwise>
