@@ -93,4 +93,8 @@
 	<util:properties id="propertyConfigurer" location="file:${PROPERTIES_PATH}/3dc.properties"/>
     <context:property-placeholder properties-ref="applicationProperties" />
 
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"></bean>
+	
+	<bean id="tika" class="org.apache.tika.Tika" />
+	
 </beans>

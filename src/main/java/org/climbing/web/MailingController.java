@@ -1,7 +1,14 @@
 package org.climbing.web;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,6 +16,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.util.IOUtils;
+import org.apache.tika.Tika;
 import org.climbing.domain.Person;
 import org.climbing.repo.ConfigurationsDAO;
 import org.climbing.repo.PersonDAO;
@@ -21,6 +30,7 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -41,6 +51,9 @@ public class MailingController {
 	@Autowired
 	PersonDAO personDao;
 	
+	@Autowired
+	Tika tika;
+	
 	@RequestMapping(method=RequestMethod.GET)
     public String load(Model model)
     {
@@ -48,7 +61,7 @@ public class MailingController {
     }
 	
 	@RequestMapping(method=RequestMethod.POST, params = "method=send")
-    public String send(HttpServletRequest request, HttpServletResponse response,
+    public String send(MultipartHttpServletRequest request, HttpServletResponse response,
 			ModelMap model, final RedirectAttributes redirectAttributes)
     {
 		String subject = request.getParameter("subject");
@@ -61,6 +74,45 @@ public class MailingController {
 		String fromName = configurationsDao.findByKey("smtp.default.from.name").getValue();
 		Integer mailingBatchSize = Integer.parseInt(configurationsDao.findByKey("mailing.batch.size").getValue());;
 		
+		Iterator<String> attIterator = request.getFileNames();
+		HashMap<String, byte[]> attachments = new HashMap<String, byte[]>();
+		HashMap<String, String> mimeTypes = new HashMap<String, String>();
+		while(attIterator.hasNext()) {
+			try {
+				String v = attIterator.next();
+				if(!request.getFile(v).isEmpty()) {
+					InputStream att = request.getFile(v).getInputStream();
+					String mimeType = tika.detect(request.getFile(v).getOriginalFilename());
+//					String mimeType = tika.detect(att, request.getFile(v).getOriginalFilename());
+//					ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+//
+//					int nRead;
+//					byte[] data = new byte[16384];
+//
+//					while ((nRead = att.read(data, 0, data.length)) != -1) {
+//					  buffer.write(data, 0, nRead);
+//					}
+//
+//					buffer.flush();
+//
+//					byte[] attContent = buffer.toByteArray();
+					
+					byte[] attContent = IOUtils.toByteArray(att);
+					
+//					FileOutputStream fos = new FileOutputStream(new File("E://temp//out.pdf"));
+//					fos.write(attContent);
+//					fos.close();
+					
+					log.info("Attachment {} size: {}", request.getFile(v).getOriginalFilename(), attContent.length);
+					attachments.put(request.getFile(v).getOriginalFilename(), attContent);
+					mimeTypes.put(request.getFile(v).getOriginalFilename(), mimeType);
+				}
+			} catch (IOException e) {
+				log.error("Error adding attchment");
+				e.printStackTrace();
+			}
+		}
+		
 		String result = "";
 		if(!"recipients".equals(type)) {
 			String env = System.getProperty("PLATFORM");
@@ -68,7 +120,7 @@ public class MailingController {
 			if("develop".equals(env) || "test".equals(env)) {
 				toListCCN.add(testEnvAllDest);
 				try {
-        			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
+        			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, attachments, mimeTypes, true);
         			result = "Email inviata a " + toListCCN.size() + " indirizzi";
         		} catch (Exception e) {
         			
@@ -80,8 +132,12 @@ public class MailingController {
 				List<Person> persons = new ArrayList<Person>();
 				if("all".equals(type)) {
 					persons = personDao.findMailingAll();
-				} else {
+				} else if("subscribers".equals(type)) {
 					persons = personDao.findMailingRegistered();
+				} else if("nocertificate".equals(type)) {
+					persons = personDao.findPersonsWithoutCertificate(true);
+				} else {
+					result = "Specificare i destinatari";
 				}
 				
 				List<String> sent = new ArrayList<String>(); 
@@ -104,7 +160,7 @@ public class MailingController {
 			        
 			        if(toListCCN.size() == mailingBatchSize || ((i == persons.size()-1) && toListCCN.size() > 0)) {
 			        	try {
-		        			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
+		        			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, attachments, mimeTypes, true);
 		        			sent.addAll(toListCCN);
 		        		} catch (Exception e) {
 		        			
@@ -128,9 +184,10 @@ public class MailingController {
 				}
 			}
 			try {
-    			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, null, null, true);
+    			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, attachments, mimeTypes, true);
     			
     			result = "Email inviata a " + alreadySent.size() + " indirizzi";
+    			
     		} catch (Exception e) {
     			
     			log.info("Cannot send mailing: {}", e.getMessage());
@@ -139,6 +196,7 @@ public class MailingController {
     		}
 		}
 		
+		log.info("Mailing result: {}", result);
 		
 		redirectAttributes.addAttribute("result", result);
         return "redirect:/mailing";
