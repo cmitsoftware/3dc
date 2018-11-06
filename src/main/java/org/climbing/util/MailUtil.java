@@ -130,7 +130,7 @@ public class MailUtil {
 	        email.addTo("michele.cervini@gmail.com");
 	        email.addTo("giannirace@gmail.com");
 	 
-	        ByteArrayDataSource ds = new ByteArrayDataSource(reportUtil.buildPersonsReport(),
+	        ByteArrayDataSource ds = new ByteArrayDataSource(reportUtil.buildGeneralReport(),
 	        		"application/vnd.ms-excel");
 //	        		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 	        

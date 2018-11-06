@@ -50,7 +50,7 @@ public class ReportController {
 			Date now = new Date();
 			log.info("Requested general report");
 			
-			byte[] report = reportUtil.buildPersonsReport();
+			byte[] report = reportUtil.buildGeneralReport();
 
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 			String name = "Report-iscritti-" + sdf.format(now) + ".xlsx";
@@ -96,4 +96,5 @@ public class ReportController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
     }
+	
 }

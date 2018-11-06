@@ -109,21 +109,27 @@ public class PersonController {
 			}
 			
 			person.setAddress(request.getParameter("address"));
-			if(!"".equals(request.getParameter("affiliationDate"))) {
+			if(!StringUtils.isEmpty(request.getParameter("affiliationDate"))) {
 				person.setAffiliationDate(sdf.parse(request.getParameter("affiliationDate")));
 			}
-			if(!"".equals(request.getParameter("birthDate"))) {
+			if(!StringUtils.isEmpty(request.getParameter("birthDate"))) {
 				person.setBirthDate(sdf.parse(request.getParameter("birthDate")));
 			}
-			if(!"".equals(request.getParameter("certificationDate"))) {
+			if(!StringUtils.isEmpty(request.getParameter("certificationDate"))) {
 				person.setCertificationDate(sdf.parse(request.getParameter("certificationDate")));
+			}
+			if(!StringUtils.isEmpty(request.getParameter("approvalDate"))) {
+				person.setApprovalDate(sdf.parse(request.getParameter("approvalDate")));
+			}
+			if(!StringUtils.isEmpty(request.getParameter("firstRegistrationDate"))) {
+				person.setFirstRegistrationDate(sdf.parse(request.getParameter("firstRegistrationDate")));
+			}
+			if(!StringUtils.isEmpty(request.getParameter("freeEntryDate"))) {
+				person.setFreeEntryDate(sdf.parse(request.getParameter("freeEntryDate")));
 			}
 			person.setCf(request.getParameter("cf"));
 			person.setCity(request.getParameter("city"));
 			person.setEmail(request.getParameter("email"));
-			if(!"".equals(request.getParameter("freeEntryDate"))) {
-				person.setFreeEntryDate(sdf.parse(request.getParameter("freeEntryDate")));
-			}
 			if("on".equals(request.getParameter("mailing"))){
 				person.setMailing(true);
 			} else {

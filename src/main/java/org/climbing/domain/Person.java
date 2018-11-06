@@ -33,19 +33,24 @@ public class Person implements java.io.Serializable {
 	private String email;
 	private String cf;
 	private Date birthDate;
-	//Data iscrizione
+	//Data iscrizione annuale
 	private Date registrationDate;
 	//Data abbonamento
 	private Date subscriptionDate;
 	//Data certificato medico
 	private Date certificationDate;
-	//Data affiliazione
+	//Data affiliazione FASI
 	private Date affiliationDate;
 	//Data prova gratuita
 	private Date freeEntryDate;
-	private Boolean mailing;
 	//Data creazione anagrafica
 	private Date creationDate;
+	//Data approvazione socio
+	private Date approvalDate;
+	//Data richiesta prima iscrizione (in cui viene compilato il modulo)
+	private Date firstRegistrationDate;
+	
+	private Boolean mailing;
 	private Integer number;
 
 	public Person() {
@@ -223,6 +228,26 @@ public class Person implements java.io.Serializable {
 		this.number = number;
 	}
 	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "approval_date")
+	public Date getApprovalDate() {
+		return approvalDate;
+	}
+
+	public void setApprovalDate(Date approvalDate) {
+		this.approvalDate = approvalDate;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "first_registration_date")
+	public Date getFirstRegistrationDate() {
+		return firstRegistrationDate;
+	}
+
+	public void setFirstRegistrationDate(Date firstRegistrationDate) {
+		this.firstRegistrationDate = firstRegistrationDate;
+	}
+
 	@Transient
 	public boolean registrationValid(){
 		if(this.registrationDate != null) {
