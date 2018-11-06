@@ -118,6 +118,12 @@ public class PersonController {
 			if(!"".equals(request.getParameter("certificationDate"))) {
 				person.setCertificationDate(sdf.parse(request.getParameter("certificationDate")));
 			}
+			if(!"".equals(request.getParameter("approvalDate"))) {
+				person.setApprovalDate(sdf.parse(request.getParameter("approvalDate")));
+			}
+			if(!"".equals(request.getParameter("firstRegistrationDate"))) {
+				person.setFirstRegistrationDate(sdf.parse(request.getParameter("firstRegistrationDate")));
+			}
 			person.setCf(request.getParameter("cf"));
 			person.setCity(request.getParameter("city"));
 			person.setEmail(request.getParameter("email"));

@@ -83,8 +83,8 @@
 					                 		class="form-control pull-right active"
 					                 		value="${person.phone}">
 						        	</div>
-	              					<div class="form-group col-xs-12 col-md-6">
-					               		<label>Data iscrizione 3dc</label>
+	              					<div class="form-group col-xs-12 col-md-3">
+					               		<label>Data iscrizione 3dc annuale</label>
 						               	<div class="input-group">
 						                	<div class="input-group-addon">
 						                   		<i class="fa fa-calendar"></i>
@@ -94,7 +94,7 @@
 						                 		value="<fmt:formatDate value='${person.registrationDate}' pattern='dd/MM/yyyy'/>">
 					               		</div>
 						        	</div>
-						        	<div class="form-group col-xs-12 col-md-6">
+						        	<div class="form-group col-xs-12 col-md-3">
 					               		<label>Data certificato medico</label>
 						               	<div class="input-group">
 						                	<div class="input-group-addon">
@@ -105,7 +105,7 @@
 						                 		value="<fmt:formatDate value='${person.certificationDate}' pattern='dd/MM/yyyy'/>">
 					               		</div>
 						        	</div>
-						        	<div class="form-group col-xs-12 col-md-6">
+						        	<div class="form-group col-xs-12 col-md-3">
 					               		<label>Data abbonamento</label>
 						               	<div class="input-group">
 						                	<div class="input-group-addon">
@@ -116,7 +116,19 @@
 						                 		value="<fmt:formatDate value='${person.subscriptionDate}' pattern='dd/MM/yyyy'/>">
 					               		</div>
 						        	</div>
-						        	<div class="form-group col-xs-12 col-md-6">
+						        	<div class="form-group col-xs-12 col-md-3">
+					               		<label>Data affiliazione FASI</label>
+						               	<div class="input-group">
+						                	<div class="input-group-addon">
+						                   		<i class="fa fa-calendar"></i>
+						                 	</div>
+						                 	<input id="affiliationDate" name="affiliationDate" 
+						                 		type="text" class="form-control pull-right active 3dc-date"
+						                 		value="<fmt:formatDate value='${person.affiliationDate}' pattern='dd/MM/yyyy'/>">
+					               		</div>
+					               		<!-- /.input group -->
+						        	</div>
+						        	<%-- <div class="form-group col-xs-12 col-md-6">
 					               		<label>Data prova gratuita</label>
 						               	<div class="input-group">
 						                	<div class="input-group-addon">
@@ -126,7 +138,7 @@
 						                 		type="text" class="form-control pull-right active 3dc-date"
 						                 		value="<fmt:formatDate value='${person.freeEntryDate}' pattern='dd/MM/yyyy'/>">
 					               		</div>
-						        	</div>
+						        	</div> --%>
 	    						</div>
 	    					</div>
 	    				</div>
@@ -159,8 +171,8 @@
 					                 		type="text" class="form-control pull-right active"
 					                 		value="${person.address}">
 						        	</div>
-	              					<div class="form-group col-xs-12 col-md-6">
-					               		<label>Data nascita</label>
+	              					<div class="form-group col-xs-12 col-md-3">
+					               		<label>Data di nascita</label>
 						               	<div class="input-group">
 						                	<div class="input-group-addon">
 						                   		<i class="fa fa-calendar"></i>
@@ -171,17 +183,39 @@
 					               		</div>
 					               		<!-- /.input group -->
 						        	</div>
-						        	<div class="form-group col-xs-12 col-md-6">
-					               		<label>Data affiliazione</label>
+						        	
+						        	<div class="form-group col-xs-12 col-md-3">
+					               		<label>Data richiesta prima iscrizione</label>
 						               	<div class="input-group">
 						                	<div class="input-group-addon">
 						                   		<i class="fa fa-calendar"></i>
 						                 	</div>
-						                 	<input id="affiliationDate" name="affiliationDate" 
+						                 	<input id="firstRegistrationDate" name="firstRegistrationDate" 
 						                 		type="text" class="form-control pull-right active 3dc-date"
-						                 		value="<fmt:formatDate value='${person.affiliationDate}' pattern='dd/MM/yyyy'/>">
+						                 		value="<fmt:formatDate value='${person.firstRegistrationDate}' pattern='dd/MM/yyyy'/>">
 					               		</div>
-					               		<!-- /.input group -->
+						        	</div>
+						        	<div class="form-group col-xs-12 col-md-3">
+					               		<label>Data di approvazione</label>
+						               	<div class="input-group">
+						                	<div class="input-group-addon">
+						                   		<i class="fa fa-calendar"></i>
+						                 	</div>
+						                 	<input id="firstRegistrationDate" name="firstRegistrationDate" 
+						                 		type="text" class="form-control pull-right active 3dc-date"
+						                 		value="<fmt:formatDate value='${person.firstRegistrationDate}' pattern='dd/MM/yyyy'/>">
+					               		</div>
+						        	</div>
+						        	<div class="form-group col-xs-12 col-md-3">
+					               		<label>Data creazione anagrafica</label>
+						               	<div class="input-group">
+						                	<div class="input-group-addon">
+						                   		<i class="fa fa-calendar"></i>
+						                 	</div>
+						                 	<input id="creationDate" name="creationDate" 
+						                 		type="text" class="form-control pull-right active 3dc-date" readonly="readonly"
+						                 		value="<fmt:formatDate value='${person.creationDate}' pattern='dd/MM/yyyy'/>">
+					               		</div>
 						        	</div>
 						        	<div class="form-group col-xs-12 col-md-12 checkbox">
 					                  	<label>
