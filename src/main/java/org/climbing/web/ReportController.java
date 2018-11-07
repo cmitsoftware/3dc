@@ -1,16 +1,23 @@
 package org.climbing.web;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.climbing.repo.UserDAO;
 import org.climbing.util.ReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +27,8 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -33,6 +42,8 @@ public class ReportController {
 	
 	@Autowired
 	ReportUtil reportUtil;
+	
+	@Value("${tmp.user.path}") private String tmpUserPath;
 	
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	
@@ -97,4 +108,40 @@ public class ReportController {
 		}
     }
 	
+	@RequestMapping(value = "/uploadExcel", method = RequestMethod.POST)
+	public String uploadExcel(@RequestParam(value="file", required = true) MultipartFile[] filetoupload,
+			HttpServletRequest request, HttpServletResponse response) {
+		
+		XSSFWorkbook workbook = null;
+		XSSFSheet sheet = null;
+		
+		try {
+
+			MultipartFile fFile = filetoupload[0];
+			File file = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
+			fFile.transferTo(file);
+			
+			OPCPackage opcPackage = OPCPackage.open(file);
+			workbook = new XSSFWorkbook(opcPackage);
+
+			sheet = workbook.getSheetAt(0);
+			
+			Iterator<Row> rowIterator = null;
+			rowIterator = sheet.iterator();
+			// skip headers
+			if (rowIterator.hasNext()) {
+				rowIterator.next();
+			}
+
+			while (rowIterator.hasNext()) {
+				
+				Row row = rowIterator.next();
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 }
