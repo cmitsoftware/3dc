@@ -201,9 +201,9 @@
 						                	<div class="input-group-addon">
 						                   		<i class="fa fa-calendar"></i>
 						                 	</div>
-						                 	<input id="firstRegistrationDate" name="firstRegistrationDate" 
+						                 	<input id="approvalDate" name="approvalDate" 
 						                 		type="text" class="form-control pull-right active 3dc-date"
-						                 		value="<fmt:formatDate value='${person.firstRegistrationDate}' pattern='dd/MM/yyyy'/>">
+						                 		value="<fmt:formatDate value='${person.approvalDate}' pattern='dd/MM/yyyy'/>">
 					               		</div>
 						        	</div>
 						        	<div class="form-group col-xs-12 col-md-3">

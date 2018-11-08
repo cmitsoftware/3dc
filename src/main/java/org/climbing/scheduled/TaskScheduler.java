@@ -42,7 +42,7 @@ public class TaskScheduler {
 		Date now = new Date();
 		log.info("Generating report");
 		
-		byte[] report = reportUtil.buildPersonsReport();
+		byte[] report = reportUtil.buildGeneralReport();
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		String name = "Report-iscritti-" + sdf.format(now) + ".xlsx";

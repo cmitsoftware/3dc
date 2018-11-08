@@ -20,14 +20,14 @@ public class ReportUtil {
 	@Autowired
 	PersonDAO personDao;
 	
-	public byte[] buildPersonsReport() {
+	public byte[] buildGeneralReport() {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		try {
 			
 			@SuppressWarnings("resource")
 			XSSFWorkbook wb = new XSSFWorkbook();
-	        XSSFSheet sheetsData = wb.createSheet("Contatori");
+	        XSSFSheet sheetsData = wb.createSheet("Report generale");
 	        
 	        XSSFFont titlesFont = wb.createFont();
 	        titlesFont.setBold(true);
@@ -59,7 +59,7 @@ public class ReportUtil {
 	        
 	        colOffset++;
 	        Cell title5Cell = titlesRow.createCell(colOffset);
-	        title5Cell.setCellValue("Data iscrizione 3D");
+	        title5Cell.setCellValue("Data iscrizione 3dc annuale");
 	        title5Cell.setCellStyle(titlesStyle);
 	        
 	        colOffset++;
@@ -104,13 +104,23 @@ public class ReportUtil {
 
 	        colOffset++;
 	        Cell title14Cell = titlesRow.createCell(colOffset);
-	        title14Cell.setCellValue("Data affiliazione");
+	        title14Cell.setCellValue("Data affiliazione FASI");
 	        title14Cell.setCellStyle(titlesStyle);
 	        
 	        colOffset++;
 	        Cell title15Cell = titlesRow.createCell(colOffset);
-	        title15Cell.setCellValue("Data prima registrazione 3D");
+	        title15Cell.setCellValue("Data prima iscrizione 3dc");
 	        title15Cell.setCellStyle(titlesStyle);
+	        
+	        colOffset++;
+	        Cell title16Cell = titlesRow.createCell(colOffset);
+	        title16Cell.setCellValue("Data approvazione 3dc");
+	        title16Cell.setCellStyle(titlesStyle);
+	        
+	        colOffset++;
+	        Cell title17Cell = titlesRow.createCell(colOffset);
+	        title17Cell.setCellValue("Data creazione anagrafica");
+	        title17Cell.setCellStyle(titlesStyle);
 	        
 	        for(Person p: personDao.findAll("surname", "asc")) {
 	        	
@@ -183,7 +193,17 @@ public class ReportUtil {
 		        
 		        colOffset++;
 		        Cell cell15 = personRow.createCell(colOffset);
-		        cell15.setCellValue(p.getCreationDate() != null ? 
+		        cell15.setCellValue(p.getFirstRegistrationDate() != null ? 
+		        		sdf.format(p.getFirstRegistrationDate()) : "");
+		        
+		        colOffset++;
+		        Cell cell16 = personRow.createCell(colOffset);
+		        cell16.setCellValue(p.getApprovalDate() != null ? 
+		        		sdf.format(p.getApprovalDate()) : "");
+		        
+		        colOffset++;
+		        Cell cell17 = personRow.createCell(colOffset);
+		        cell17.setCellValue(p.getCreationDate() != null ? 
 		        		sdf.format(p.getCreationDate()) : "");
 	        }
 	        
