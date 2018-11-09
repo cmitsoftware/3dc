@@ -44,6 +44,33 @@
     					</div>
 	    			</div>        				
 	    		</div>
+				<div class="row">
+					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4">
+						<div class="box box-primary">
+							<div class="box-header with-border">
+								<h3 class="box-title">Importa iscritti</h3>
+							</div>
+							<!-- /.box-header -->
+							<!-- form start -->
+							<form role="form" action="${pageContext.servletContext.contextPath}/report" method="post" >
+								<input type="hidden" name="method" value="uploadExcel"/>
+								<div class="box-body">
+									<div class="form-group">
+										<label for="persons-excel">File excel</label> 
+										<input type="file" name="file" id="persons-excel">
+										<p class="help-block">
+											Attenzione: il formato deve essere lo stesso del report <i>Tutti gli iscritti</i>
+										</p>
+									</div>
+								</div>
+								<!-- /.box-body -->
+								<div class="box-footer">
+									<button type="submit" class="btn btn-primary">Importa</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
 			</section>
    			<!-- /.content -->
 		</div>

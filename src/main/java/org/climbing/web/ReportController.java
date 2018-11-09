@@ -108,40 +108,4 @@ public class ReportController {
 		}
     }
 	
-	@RequestMapping(value = "/uploadExcel", method = RequestMethod.POST)
-	public String uploadExcel(@RequestParam(value="file", required = true) MultipartFile[] filetoupload,
-			HttpServletRequest request, HttpServletResponse response) {
-		
-		XSSFWorkbook workbook = null;
-		XSSFSheet sheet = null;
-		
-		try {
-
-			MultipartFile fFile = filetoupload[0];
-			File file = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
-			fFile.transferTo(file);
-			
-			OPCPackage opcPackage = OPCPackage.open(file);
-			workbook = new XSSFWorkbook(opcPackage);
-
-			sheet = workbook.getSheetAt(0);
-			
-			Iterator<Row> rowIterator = null;
-			rowIterator = sheet.iterator();
-			// skip headers
-			if (rowIterator.hasNext()) {
-				rowIterator.next();
-			}
-
-			while (rowIterator.hasNext()) {
-				
-				Row row = rowIterator.next();
-				
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
 }
