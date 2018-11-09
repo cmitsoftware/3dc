@@ -35,8 +35,8 @@ mysqladmin -p -u root version
 Connettersi a mysql con 
 mysql -u root -p
 
-Creare l'utente per il database con password 3TZ8pCNy
-CREATE USER 'gym'@'localhost' IDENTIFIED BY '3TZ8pCNy';
+Creare l'utente per il database con password XXXX
+CREATE USER 'gym'@'localhost' IDENTIFIED BY 'XXXX';
 
 Verificare se l'utente viene creato
 select User,Host from mysql.user;
