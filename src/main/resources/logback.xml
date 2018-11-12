@@ -12,14 +12,14 @@
         <then>
             <property name="LOG_LEVEL" value="DEBUG"/>
             <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		       	<file>C:\temp\3dc.log</file>
+		       	<file>E:\michele\temp\3dc\3dc.log</file>
 				<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 					<Pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 					</Pattern>
 				</encoder>
 		
 		        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-		            <FileNamePattern>C:\temp\3dc.log.%i.log</FileNamePattern>
+		            <FileNamePattern>E:\michele\temp\3dc\3dc.log.%i.log</FileNamePattern>
 		            <MinIndex>1</MinIndex>
 		            <MaxIndex>10</MaxIndex>
 		        </rollingPolicy>
@@ -35,7 +35,8 @@
     </if>
 	
 	<logger name="org.hibernate" level="INFO" />
-	<logger name="org.springframework" level="INFO" />
+	<logger name="org.springframework" level="DEBUG" />
+	<logger name="org.springframework.beans.factory.config.PropertiesFactoryBean" level="DEBUG" />
 	<logger name="org.springframework.security" level="INFO" />
     <logger name="org.climbing" level="${LOG_LEVEL}" />
 

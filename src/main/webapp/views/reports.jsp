@@ -52,12 +52,12 @@
 							</div>
 							<!-- /.box-header -->
 							<!-- form start -->
-							<form role="form" action="${pageContext.servletContext.contextPath}/report" method="post" >
-								<input type="hidden" name="method" value="uploadExcel"/>
+							<form role="form" action="${pageContext.servletContext.contextPath}/report?method=importPersons" method="post" enctype="multipart/form-data">
+								<!-- <input type="hidden" name="method" value="importPersons"/> -->
 								<div class="box-body">
 									<div class="form-group">
-										<label for="persons-excel">File excel</label> 
-										<input type="file" name="file" id="persons-excel">
+										<label for="file">File excel</label> 
+										<input type="file" name="file" id="file">
 										<p class="help-block">
 											Attenzione: il formato deve essere lo stesso del report <i>Tutti gli iscritti</i>
 										</p>

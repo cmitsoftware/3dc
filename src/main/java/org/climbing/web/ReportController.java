@@ -43,8 +43,6 @@ public class ReportController {
 	@Autowired
 	ReportUtil reportUtil;
 	
-	@Value("${tmp.user.path}") private String tmpUserPath;
-	
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	
 	@RequestMapping(method=RequestMethod.GET)

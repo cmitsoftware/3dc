@@ -324,4 +324,17 @@ public class Person implements java.io.Serializable {
 		}
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "Person [id=" + id + ", user=" + user + ", name=" + name + ", surname=" + surname + ", address="
+				+ address + ", city=" + city + ", phone=" + phone + ", email=" + email + ", cf=" + cf + ", birthDate="
+				+ birthDate + ", registrationDate=" + registrationDate + ", subscriptionDate=" + subscriptionDate
+				+ ", certificationDate=" + certificationDate + ", affiliationDate=" + affiliationDate
+				+ ", freeEntryDate=" + freeEntryDate + ", creationDate=" + creationDate + ", approvalDate="
+				+ approvalDate + ", firstRegistrationDate=" + firstRegistrationDate + ", mailing=" + mailing
+				+ ", number=" + number + "]";
+	}
+	
+	
 }

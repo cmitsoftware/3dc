@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +19,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.climbing.domain.Person;
+import org.climbing.repo.PersonDAO;
 import org.climbing.repo.UserDAO;
 import org.climbing.util.ReportUtil;
 import org.slf4j.Logger;
@@ -54,7 +57,7 @@ public class ImportController {
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	
 	@RequestMapping(params = "method=importPersons", method = RequestMethod.POST)
-	public String uploadExcel(@RequestParam(value="file", required = true) MultipartFile[] filetoupload,
+	public String importPersons(@RequestParam(value="file") MultipartFile[] file,
 			HttpServletRequest request, HttpServletResponse response) {
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -64,11 +67,16 @@ public class ImportController {
 		
 		try {
 
-			MultipartFile fFile = filetoupload[0];
-			File file = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
-			fFile.transferTo(file);
+			MultipartFile fFile = file[0];
+//			File tmpFile = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
+//			File tmpFile = new File(tmpUserPath + File.separator + UUID.randomUUID().toString());
 			
-			OPCPackage opcPackage = OPCPackage.open(file);
+//			File tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + fFile.getOriginalFilename());
+			File tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + UUID.randomUUID().toString());
+			
+			fFile.transferTo(tmpFile);
+			
+			OPCPackage opcPackage = OPCPackage.open(tmpFile);
 			workbook = new XSSFWorkbook(opcPackage);
 
 			sheet = workbook.getSheetAt(0);
@@ -92,24 +100,26 @@ public class ImportController {
 				Iterator<Cell> cellIterator = row.cellIterator();
 				
 				try {
+					
+					boolean createNewPerson = false;
 
-					Integer number;
-					String surname;
-					String name;
-					String phone;
-					Date registrationDate;
-					Date certificationDate;
-					Date subscriptionDate;
-					Date freeEntryDate;
-					String cf;
-					String email;
-					String city;
-					String address;
-					Date birthDate;
-					Date affiliationDate;
-					Date firstRegistrationDate;
-					Date approvalDate;
-					Date creationDate;
+					Integer number = null;
+					String surname = null;
+					String name = null;
+					String phone = null;
+					Date registrationDate = null;
+					Date certificationDate = null;
+					Date subscriptionDate = null;
+					Date freeEntryDate = null;
+					String cf = null;
+					String email = null;
+					String city = null;
+					String address = null;
+					Date birthDate = null;
+					Date affiliationDate = null;
+					Date firstRegistrationDate = null;
+					Date approvalDate = null;
+					Date creationDate = null;
 					
 					while (cellIterator.hasNext()) {
 
@@ -118,20 +128,34 @@ public class ImportController {
 
 							switch (cell.getColumnIndex()) {
 							
-							case 0: 
-								String numberS = cell.getStringCellValue().trim();
-								if(!StringUtils.isEmpty(numberS)) {
-									log.info("Number is empty. A new climber will be created");
-								} else {
+							case 0:
+								if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
 									try {
-										number = Integer.parseInt(numberS);
-									} catch (Exception e) {
+										number = (int)cell.getNumericCellValue();
+									} catch(Exception e) {
 										e.printStackTrace();
 										String error = "";
 										if(errors.containsKey(row.getRowNum())) {
 											error = errors.get(row.getRowNum());
 										}
 										error += "Errore nel leggere il campo: Numero\n";
+									}
+								} else {
+									String numberS = cell.getStringCellValue().trim();
+									if(!StringUtils.isEmpty(numberS)) {
+										log.info("Number is empty. A new climber will be created");
+										createNewPerson = true;
+									} else {
+										try {
+											number = Integer.parseInt(numberS);
+										} catch (Exception e) {
+											e.printStackTrace();
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Numero\n";
+										}
 									}
 								}
 								break;
@@ -262,17 +286,43 @@ public class ImportController {
 						}
 					}
 					
-					/*
-					 * Check 
-					 */
+					Person person = new Person();
+					if(createNewPerson) {
+						 person.setCreationDate(new Date());
+					}
+					person.setNumber(number);
+					person.setSurname(surname);
+					person.setName(name);
+					person.setPhone(phone);
+					person.setRegistrationDate(registrationDate);
+					person.setCertificationDate(certificationDate);
+					person.setSubscriptionDate(subscriptionDate);
+					person.setFreeEntryDate(freeEntryDate);
+					person.setCf(cf);
+					person.setEmail(email);
+					person.setCity(city);
+					person.setAddress(address);
+					person.setBirthDate(birthDate);
+					person.setAffiliationDate(affiliationDate);
+					person.setFirstRegistrationDate(firstRegistrationDate);
+					person.setApprovalDate(approvalDate);
 					
+					log.debug(person.toString());
+					
+					if(createNewPerson) {
+						
+					}
 					
 				} catch (Exception e) {
+					
 					e.printStackTrace();
-					errors.add(total);
+					String error = "";
+					if(errors.containsKey(row.getRowNum())) {
+						error = errors.get(row.getRowNum());
+					}
+					error += "Errore generico, verificare nei log\n";
 					continue;
 				}
-				
 				
 			}
 		} catch (Exception e) {
