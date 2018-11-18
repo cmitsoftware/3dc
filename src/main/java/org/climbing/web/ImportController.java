@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,7 +23,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.climbing.domain.Person;
 import org.climbing.repo.PersonDAO;
 import org.climbing.repo.UserDAO;
+import org.climbing.security.ClimbingUserDetails;
 import org.climbing.util.ReportUtil;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -48,6 +53,9 @@ public class ImportController {
 	
 	@Autowired
 	UserDAO userDao;
+	
+	@Autowired
+	PersonDAO personDao;
 	
 	@Autowired
 	ReportUtil reportUtil;
@@ -68,17 +76,16 @@ public class ImportController {
 		try {
 
 			MultipartFile fFile = file[0];
-//			File tmpFile = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
+			File tmpFile = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
 //			File tmpFile = new File(tmpUserPath + File.separator + UUID.randomUUID().toString());
 			
 //			File tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + fFile.getOriginalFilename());
-			File tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + UUID.randomUUID().toString());
+//			tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + UUID.randomUUID().toString());
 			
 			fFile.transferTo(tmpFile);
 			
 			OPCPackage opcPackage = OPCPackage.open(tmpFile);
 			workbook = new XSSFWorkbook(opcPackage);
-
 			sheet = workbook.getSheetAt(0);
 			
 			Iterator<Row> rowIterator = null;
@@ -287,8 +294,19 @@ public class ImportController {
 					}
 					
 					Person person = new Person();
-					if(createNewPerson) {
-						 person.setCreationDate(new Date());
+					if(number != null) {
+						DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
+						dc.add(Restrictions.eq("number", number));
+						List<Person> persons = personDao.findByCriteria(dc);
+						if(CollectionUtils.isEmpty(persons)) {
+							createNewPerson = true;
+						} else {
+							person = persons.get(0);
+							//TODO
+							// errore se piu di un utente con stesso number
+						}
+					} else {
+						number = personDao.getNextNumber() + 1;
 					}
 					person.setNumber(number);
 					person.setSurname(surname);
@@ -310,8 +328,14 @@ public class ImportController {
 					log.debug(person.toString());
 					
 					if(createNewPerson) {
-						
+						log.info("Creating new person with number {}", number);
+						person.setUser(((ClimbingUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser());
+						if(creationDate == null) {
+							creationDate = new Date();
+						} 
+						person.setCreationDate(creationDate);
 					}
+					
 					
 				} catch (Exception e) {
 					
