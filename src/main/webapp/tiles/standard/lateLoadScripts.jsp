@@ -52,3 +52,16 @@
 		});
 	</script>
 </c:if>
+<c:if test="${not empty confirmMessage}">
+	<script>
+		$(document).ready(function (){
+			var n = noty({
+				text: "${confirmMessage}",
+				layout: "bottom",
+				theme: "climbing",
+				modal: true,
+				type: "information"
+			});
+		});
+	</script>
+</c:if>

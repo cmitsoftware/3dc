@@ -207,7 +207,7 @@
 					               		</div>
 						        	</div>
 						        	<div class="form-group col-xs-12 col-md-3">
-					               		<label>Data creazione anagrafica</label>
+					               		<label>Data prima registrazione</label>
 						               	<div class="input-group">
 						                	<div class="input-group-addon">
 						                   		<i class="fa fa-calendar"></i>

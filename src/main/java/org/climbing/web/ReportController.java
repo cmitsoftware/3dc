@@ -1,23 +1,16 @@
 package org.climbing.web;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.climbing.repo.UserDAO;
 import org.climbing.util.ReportUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,8 +20,6 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -46,7 +37,7 @@ public class ReportController {
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	
 	@RequestMapping(method=RequestMethod.GET)
-    public String load(Model model){
+    public String load(Model model, final RedirectAttributes redirectAttributes){
         return "reports";
     }
 	
@@ -74,6 +65,33 @@ public class ReportController {
 			e.printStackTrace();
 			return new ResponseEntity<String>(
 					"Errore nella generazione del report. Prenditela con Gianni", 
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+    }
+	
+	@RequestMapping(method=RequestMethod.GET, params = "method=currentYear")
+    public ResponseEntity<?> currentYear(HttpServletRequest request, HttpServletResponse response,
+			ModelMap model, final RedirectAttributes redirectAttributes){
+		
+		try {
+
+			log.info("Requested current year report");
+			
+			byte[] report = reportUtil.buildCurrentYearReport();
+
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+			String name = "Report-iscritti-anno-corrente.xlsx";
+			final HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+			headers.add("Content-disposition", "attachment; filename=" + name);
+			
+			return new ResponseEntity<byte[]>(report, headers, HttpStatus.OK);
+			
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			return new ResponseEntity<String>(
+					"Errore nella generazione del report.", 
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
     }

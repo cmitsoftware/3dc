@@ -66,9 +66,14 @@ public class ImportController {
 	
 	@RequestMapping(params = "method=importPersons", method = RequestMethod.POST)
 	public String importPersons(@RequestParam(value="file") MultipartFile[] file,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response,
+			final RedirectAttributes redirectAttributes) {
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+
+		int total = 0, inserted = 0, updated = 0;
+		Map<Integer, String> errors = new HashMap<Integer, String>();
 		
 		XSSFWorkbook workbook = null;
 		XSSFSheet sheet = null;
@@ -76,8 +81,8 @@ public class ImportController {
 		try {
 
 			MultipartFile fFile = file[0];
-			File tmpFile = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
-//			File tmpFile = new File(tmpUserPath + File.separator + UUID.randomUUID().toString());
+//			File tmpFile = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
+			File tmpFile = new File(tmpUserPath + File.separator + UUID.randomUUID().toString());
 			
 //			File tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + fFile.getOriginalFilename());
 //			tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + UUID.randomUUID().toString());
@@ -95,8 +100,6 @@ public class ImportController {
 				rowIterator.next();
 			}
 
-			int total = 0;
-			Map<Integer, String> errors = new HashMap<Integer, String>();
 			while (rowIterator.hasNext()) {
 				
 				Row row = rowIterator.next();
@@ -146,6 +149,7 @@ public class ImportController {
 											error = errors.get(row.getRowNum());
 										}
 										error += "Errore nel leggere il campo: Numero\n";
+										errors.put(row.getRowNum(), error);
 									}
 								} else {
 									String numberS = cell.getStringCellValue().trim();
@@ -162,6 +166,7 @@ public class ImportController {
 												error = errors.get(row.getRowNum());
 											}
 											error += "Errore nel leggere il campo: Numero\n";
+											errors.put(row.getRowNum(), error);
 										}
 									}
 								}
@@ -176,52 +181,115 @@ public class ImportController {
 								phone = cell.getStringCellValue().trim();
 								break;
 							case 4:
-									String registrationDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(registrationDateS)) {
-										try {
-											registrationDate = sdf.parse(registrationDateS);
-										} catch (Exception e) {
-											e.printStackTrace();
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
+									try {
+										registrationDate = cell.getDateCellValue();
+									} catch (Exception e) {
+										log.warn("Cannot read registration date as date cell");
+									}
+									if(registrationDate == null ) {
+										String registrationDateS = cell.getStringCellValue().trim();
+										if(!StringUtils.isEmpty(registrationDateS)) {
+											try {
+												registrationDate = sdf1.parse(registrationDateS);
+											} catch (Exception e) {}
+											if(registrationDate == null) {
+												try {
+													registrationDate = sdf2.parse(registrationDateS);
+												} catch (Exception e) {}
 											}
-											error += "Errore nel leggere il campo: Data di iscrizione 3dc annuale\n";
-										}
-									} 
+											if(registrationDate == null) {
+												String error = "";
+												if(errors.containsKey(row.getRowNum())) {
+													error = errors.get(row.getRowNum());
+												}
+												error += "Errore nel leggere il campo: Data di iscrizione 3dc annuale\n";
+												errors.put(row.getRowNum(), error);
+											}
+										} 
+									}
 								break;
 							case 5:
+								try {
+									certificationDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read certification date as date cell");
+								}
+								if(certificationDate == null ) {
 									String certificationDateS = cell.getStringCellValue().trim();
 									if(!StringUtils.isEmpty(certificationDateS)) {
 										try {
-											certificationDate = sdf.parse(certificationDateS);
-										} catch (Exception e) {
-											e.printStackTrace();
+											certificationDate = sdf1.parse(certificationDateS);
+										} catch (Exception e) {}
+										if(certificationDate == null) {
+											try {
+												certificationDate = sdf2.parse(certificationDateS);
+											} catch (Exception e) {}
+										}
+										if(certificationDate == null) {
 											String error = "";
 											if(errors.containsKey(row.getRowNum())) {
 												error = errors.get(row.getRowNum());
 											}
 											error += "Errore nel leggere il campo: Data certificato medico\n";
+											errors.put(row.getRowNum(), error);
 										}
 									} 
+								}
+								break;
 							case 6:
 								try {
+									subscriptionDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read subscription date as date cell");
+								}
+								if(subscriptionDate == null ) {
 									String subscriptionDateS = cell.getStringCellValue().trim();
 									if(!StringUtils.isEmpty(subscriptionDateS)) {
-										subscriptionDate = sdf.parse(subscriptionDateS);
+										try {
+											subscriptionDate = sdf1.parse(subscriptionDateS);
+										} catch (Exception e) {}
+										if(subscriptionDate == null) {
+											try {
+												subscriptionDate = sdf2.parse(subscriptionDateS);
+											} catch (Exception e) {}
+										}
+										if(subscriptionDate == null) {
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Data abbonamento\n";
+											errors.put(row.getRowNum(), error);
+										}
 									} 
-								} catch (Exception e) {
-									e.printStackTrace();
 								}
 								break;
 							case 7:
 								try {
+									freeEntryDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read free entry date as date cell");
+								}
+								if(freeEntryDate == null ) {
 									String freeEntryDateS = cell.getStringCellValue().trim();
 									if(!StringUtils.isEmpty(freeEntryDateS)) {
-										freeEntryDate = sdf.parse(freeEntryDateS);
+										try {
+											freeEntryDate = sdf1.parse(freeEntryDateS);
+										} catch (Exception e) {}
+										if(freeEntryDate == null) {
+											try {
+												freeEntryDate = sdf2.parse(freeEntryDateS);
+											} catch (Exception e) {}
+										}
+										if(freeEntryDate == null) {
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Data entrata gratuita\n";
+											errors.put(row.getRowNum(), error);
+										}
 									} 
-								} catch (Exception e) {
-									e.printStackTrace();
 								}
 								break;
 							case 8:
@@ -238,53 +306,143 @@ public class ImportController {
 								break;
 							case 12:
 								try {
+									birthDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read birth date as date cell");
+								}
+								if(birthDate == null ) {
 									String birthDateS = cell.getStringCellValue().trim();
 									if(!StringUtils.isEmpty(birthDateS)) {
-										birthDate = sdf.parse(birthDateS);
+										try {
+											birthDate = sdf1.parse(birthDateS);
+										} catch (Exception e) {}
+										if(birthDate == null) {
+											try {
+												birthDate = sdf2.parse(birthDateS);
+											} catch (Exception e) {}
+										}
+										if(birthDate == null) {
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Data di nascita\n";
+											errors.put(row.getRowNum(), error);
+										}
 									} 
-								} catch (Exception e) {
-									e.printStackTrace();
 								}
 								break;
 							case 13:
 								try {
+									affiliationDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read affiliation date as date cell");
+								}
+								if(affiliationDate == null ) {
 									String affiliationDateS = cell.getStringCellValue().trim();
 									if(!StringUtils.isEmpty(affiliationDateS)) {
-										affiliationDate = sdf.parse(affiliationDateS);
+										try {
+											affiliationDate = sdf1.parse(affiliationDateS);
+										} catch (Exception e) {}
+										if(affiliationDate == null) {
+											try {
+												affiliationDate = sdf2.parse(affiliationDateS);
+											} catch (Exception e) {}
+										}
+										if(affiliationDate == null) {
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Data di affiliazione\n";
+											errors.put(row.getRowNum(), error);
+										}
 									} 
-								} catch (Exception e) {
-									e.printStackTrace();
 								}
 								break;
 							case 14:
 								try {
+									firstRegistrationDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read first registration date as date cell");
+								}
+								if(firstRegistrationDate == null ) {
 									String firstRegistrationDateS = cell.getStringCellValue().trim();
 									if(!StringUtils.isEmpty(firstRegistrationDateS)) {
-										firstRegistrationDate = sdf.parse(firstRegistrationDateS);
-									} 
-								} catch (Exception e) {
-									e.printStackTrace();
+										try {
+											firstRegistrationDate = sdf1.parse(firstRegistrationDateS);
+										} catch (Exception e) {}
+										if(firstRegistrationDate == null) {
+											try {
+												firstRegistrationDate = sdf2.parse(firstRegistrationDateS);
+											} catch (Exception e) {}
+										}
+										if(firstRegistrationDate == null) {
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Data prima registrazione 3d\n";
+											errors.put(row.getRowNum(), error);
+										} 
+									}
 								}
 								break;
 							case 15:
 								try {
+									approvalDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read approval date as date cell");
+								}
+								if(approvalDate == null ) {
 									String approvalDateS = cell.getStringCellValue().trim();
 									if(!StringUtils.isEmpty(approvalDateS)) {
-										approvalDate = sdf.parse(approvalDateS);
+										try {
+											approvalDate = sdf1.parse(approvalDateS);
+										} catch (Exception e) {}
+										if(approvalDate == null) {
+											try {
+												approvalDate = sdf2.parse(approvalDateS);
+											} catch (Exception e) {}
+										}
+										if(approvalDate == null) {
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Data di approvazione\n";
+											errors.put(row.getRowNum(), error);
+										}
 									} 
-								} catch (Exception e) {
-									e.printStackTrace();
 								}
 								break;
 							case 16:
-								try {
-									String creationDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(creationDateS)) {
-										creationDate = sdf.parse(creationDateS);
-									} 
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
+//								try {
+//									creationDate = cell.getDateCellValue();
+//								} catch (Exception e) {
+//									log.warn("Cannot read creation date as date cell");
+//								}
+//								if(creationDate == null ) {
+//									String creationDateS = cell.getStringCellValue().trim();
+//									if(!StringUtils.isEmpty(creationDateS)) {
+//										try {
+//											creationDate = sdf1.parse(creationDateS);
+//										} catch (Exception e) {}
+//										if(approvalDate == null) {
+//											try {
+//												creationDate = sdf2.parse(creationDateS);
+//											} catch (Exception e) {}
+//										}
+//										if(creationDate == null) {
+//											String error = "";
+//											if(errors.containsKey(row.getRowNum())) {
+//												error = errors.get(row.getRowNum());
+//											}
+//											error += "Errore nel leggere il campo: Data creazione anagrafica\n";
+//											errors.put(row.getRowNum(), error);
+//										}
+//									} 
+//								}
 								break;
 							}
 							
@@ -325,7 +483,7 @@ public class ImportController {
 					person.setFirstRegistrationDate(firstRegistrationDate);
 					person.setApprovalDate(approvalDate);
 					
-					log.debug(person.toString());
+//					log.debug(person.toString());
 					
 					if(createNewPerson) {
 						log.info("Creating new person with number {}", number);
@@ -334,8 +492,13 @@ public class ImportController {
 							creationDate = new Date();
 						} 
 						person.setCreationDate(creationDate);
+						personDao.save(person);
+						inserted++;
+					} else {
+						log.info("Updating person with number {}", number);
+						personDao.save(person);
+						updated++;
 					}
-					
 					
 				} catch (Exception e) {
 					
@@ -345,6 +508,7 @@ public class ImportController {
 						error = errors.get(row.getRowNum());
 					}
 					error += "Errore generico, verificare nei log\n";
+					errors.put(row.getRowNum(), error);
 					continue;
 				}
 				
@@ -353,6 +517,12 @@ public class ImportController {
 			e.printStackTrace();
 		}
 		
-		return null;
+		redirectAttributes.addFlashAttribute("importDone", true);
+		redirectAttributes.addFlashAttribute("errors", errors);
+		redirectAttributes.addFlashAttribute("total", total);
+		redirectAttributes.addFlashAttribute("inserted", inserted);
+		redirectAttributes.addFlashAttribute("updated", updated);
+		
+		return "redirect:report";
 	}
 }

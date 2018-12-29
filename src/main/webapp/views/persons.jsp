@@ -51,7 +51,7 @@
 												<th class="min-phone-l">Iscrizione</th>
 												<th class="min-phone-l">Abbonamento</th>
 												<th class="min-phone-l">Certificato</th>
-												<th class="min-phone-l">Entrata libera</th>
+												<!-- <th class="min-phone-l">Entrata libera</th> -->
 												<th class="min-phone-l"></th>
 											</tr>
 										</thead>
@@ -114,7 +114,7 @@
 		    			{ "data": "registrationValid" },
 		    			{ "data": "subscriptionValid" },
 		    			{ "data": "certificationValid" },
-		    			{ "data": "freeEntryAvailable" },
+		    			//{ "data": "freeEntryAvailable" },
 		    			//{ "data": null },
 		    			{ "data": null }
 		    		],
@@ -138,7 +138,7 @@
 						"responsivePriority": 2
 					},
 					{	
-						"targets": [3,4,5,6], 
+						"targets": [3,4,5], 
 						"render": function ( data, type, row ) {
 							if(data) {
 		  						return "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>";

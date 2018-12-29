@@ -106,6 +106,27 @@ public class PersonDAO extends BaseHibernateDAO{
     	
     }
     
+    public List<Person> findThisYearSubscribed(String order, String direction) {
+    	
+    	Calendar yearStart = Calendar.getInstance();
+    	yearStart.set(Calendar.MONTH, 0);
+    	yearStart.set(Calendar.DAY_OF_MONTH, 1);
+    	Calendar oneYearAgo = Calendar.getInstance();
+    	oneYearAgo.add(Calendar.YEAR, -1);
+         
+    	DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
+    	dc.add(Restrictions.gt("registrationDate", yearStart.getTime()));
+    	if(order != null) {
+    		if("asc".equals(direction)) {
+    			dc.addOrder(Order.asc(order));
+    		} else {
+    			dc.addOrder(Order.desc(order));
+    		}
+        }
+    	return findByCriteria(dc);
+    	
+    }
+    
     @SuppressWarnings("unchecked")
 	public List<Person> search(String searchToken, String order, String direction,
     		int firstResult, int maxResults){
