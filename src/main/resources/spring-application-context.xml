@@ -80,4 +80,21 @@
 	
 	<tx:annotation-driven transaction-manager="transactionManager" />
 	
+     <!-- Load properties to be loaded with @Value -->
+    <bean id="applicationProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+	    <property name="locations">
+	        <list>
+	        	<value>file:${PROPERTIES_PATH}/3dc.properties</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<!-- Load properties to be used in jsp -->
+	<util:properties id="propertyConfigurer" location="file:${PROPERTIES_PATH}/3dc.properties"/>
+    <context:property-placeholder properties-ref="applicationProperties" />
+
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"></bean>
+	
+	<bean id="tika" class="org.apache.tika.Tika" />
+	
 </beans>

@@ -84,7 +84,7 @@ public class PersonDAO extends BaseHibernateDAO{
 		}
     }
     
-    public List<Person> findPersonsWithoutCertificate() {
+    public List<Person> findPersonsWithoutCertificate(Boolean mailing) {
     	
     	Calendar yearStart = Calendar.getInstance();
     	yearStart.set(Calendar.MONTH, 0);
@@ -101,6 +101,9 @@ public class PersonDAO extends BaseHibernateDAO{
     					Restrictions.isNull("certificationDate")
     					)
     			));
+    	if(mailing != null) {
+    		dc.add(Restrictions.eq("mailing", mailing));
+    	}
     	dc.addOrder(Order.asc("surname"));
     	return findByCriteria(dc);
     	
