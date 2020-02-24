@@ -528,7 +528,7 @@ public class ReportUtil {
 	        title17Cell.setCellValue("Data prima registrazione");
 	        title17Cell.setCellStyle(titlesStyle);
 	        
-	        for(Person p: personDao.findPersonsWithoutCertificate()) {
+	        for(Person p: personDao.findPersonsWithoutCertificate(null)) {
 	        	
 	        	rowOffset++;
 	        	colOffset = 0;

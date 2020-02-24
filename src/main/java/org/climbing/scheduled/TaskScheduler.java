@@ -121,7 +121,7 @@ public class TaskScheduler {
 			message += "<th style='border: 1px solid black;height:30px;background-color: #3c8dbc;color: white;padding: 10px;'>Telefono</th>";
 			message += "</tr>";
 			
-			List<Person> personsWithoutCertificate = personDao.findPersonsWithoutCertificate();
+			List<Person> personsWithoutCertificate = personDao.findPersonsWithoutCertificate(null);
 			for(Person p: personsWithoutCertificate) {
 				message += "<tr>";
 				message += "<td style='border: 1px solid black;padding: 10px;'>";
