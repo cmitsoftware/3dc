@@ -1,0 +1,18 @@
+aggiunto SmartTomcat come plugin per Intellij
+
+spostato il file di properties eserno 3dc.properties in C:\Users\giovanni.saba\workspace\3dc\etc
+quindi nelle conf di tomcat (conf della configurazione di lancio di intellij) aggiunta la ENV property -> PROPERTIES_PATH=C:\Users\giovanni.saba\workspace\3dc\etc
+
+nel pom.xml:
+    aggiunto dependancy JAXB perchè la versione 13 di java non la supporta piu nativamente
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
+    upgrade versione mysql connector perchè sulla mia macchina ho un mysql 8
+        <veersion.mysql>8.0.11</veersion.mysql>
+
+nel file di properties 3dc.properties aggiunto l'encoding utf8 all url di connessione del DB
+    ?characterEncoding=utf8

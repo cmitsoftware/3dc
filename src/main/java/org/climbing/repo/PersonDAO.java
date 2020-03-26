@@ -204,6 +204,18 @@ public class PersonDAO extends BaseHibernateDAO{
     	return findByCriteria(dc);
 		
 	}
+
+	public List<Person> findMailingAllWithNotValidEmail() {
+
+		DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
+		dc.add(Restrictions.eq("mailing", true));
+		dc.add( Restrictions.or()
+				.add(Restrictions.isNull("email"))
+				.add(Restrictions.eq("email", ""))
+				.add(Restrictions.not(Restrictions.like("email", "%@%"))));
+
+		return findByCriteria(dc);
+	}
 	
 	public List<Person> findMailingRegistered() {
 		
@@ -219,5 +231,22 @@ public class PersonDAO extends BaseHibernateDAO{
     	
     	return findByCriteria(dc);
 		
+	}
+
+	public List<Person> findMailingRegisteredWithNoValidEmail() {
+
+		Calendar yearStart = Calendar.getInstance();
+		yearStart.set(Calendar.MONTH, 0);
+		yearStart.set(Calendar.DAY_OF_MONTH, 0);
+
+		DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
+		dc.add(Restrictions.eq("mailing", true));
+		dc.add(Restrictions.ge("registrationDate", yearStart.getTime()));
+		dc.add(Restrictions.or()
+				.add(Restrictions.isNull("email"))
+				.add(Restrictions.eq("email"))
+				.add(Restrictions.not(Restrictions.like("email", "%@%"))));
+
+		return findByCriteria(dc);
 	}
 }
