@@ -54,7 +54,7 @@
 					                	<button type="submit" mailing-type="recipients" class="btn btn-primary mailing-form-submit">Invia mail a indirizzi specificati</button>
 					                	<button type="submit" mailing-type="all" class="btn btn-warning mailing-form-submit">Invia a tutti i climber</button>
 					                	<button type="submit" mailing-type="subscribed" class="btn btn-success mailing-form-submit">Invia a tutti gli iscritti dell'anno corrente</button>
-					                	<button type="submit" mailing-type="subscribed" class="btn btn-danger mailing-form-submit">Invia agli iscritti dell'anno corrente senza certificato</button>
+					                	<button type="submit" mailing-type="nocertificate" class="btn btn-danger mailing-form-submit">Invia agli iscritti dell'anno corrente senza certificato</button>
 					              	</div>
 	            				</c:when>
 								<c:otherwise>
@@ -158,7 +158,7 @@
 		       				modal: true,
 		       				type: "notification",
 		       				buttons: [
-								{addClass: "btn btn-primary", text: "Si", 
+								{addClass: "btn btn-primary", text: "Si",
 									onClick: function($noty) {
 										$("#mailing-form").submit();
 									}
@@ -166,7 +166,23 @@
 								{addClass: "btn btn-danger", text: "No", onClick: function($noty) {$noty.close();}}
 							]
 		       			});
-					}
+					} else if($("#mailing-type").val() == "nocertificate") {
+                        var n = noty({
+                            text: "Inviare la mail a tutti gli iscritti senza certificato?",
+                            layout: "center",
+                            theme: "climbing",
+                            modal: true,
+                            type: "notification",
+                            buttons: [
+                                {addClass: "btn btn-primary", text: "Si",
+                                    onClick: function($noty) {
+                                        $("#mailing-form").submit();
+                                    }
+                                },
+                                {addClass: "btn btn-danger", text: "No", onClick: function($noty) {$noty.close();}}
+                            ]
+                        });
+                    }
 				});
 			});
 		</script>

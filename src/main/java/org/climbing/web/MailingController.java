@@ -5,13 +5,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -130,16 +127,20 @@ public class MailingController {
         		}
 			} else {
 				List<Person> persons = new ArrayList<Person>();
+				List<Person> personsWithNoValidEmail = new ArrayList<Person>();
 				if("all".equals(type)) {
 					persons = personDao.findMailingAll();
-				} else if("subscribers".equals(type)) {
+					personsWithNoValidEmail = personDao.findMailingAllWithNotValidEmail();
+				} else if("subscribed".equals(type)) {
 					persons = personDao.findMailingRegistered();
+					personsWithNoValidEmail = personDao.findMailingRegisteredWithNoValidEmail();
 				} else if("nocertificate".equals(type)) {
 					persons = personDao.findPersonsWithoutCertificate(true);
+					personsWithNoValidEmail = persons.stream().filter(person -> person.getEmail() != null ? !isEmailValid(person.getEmail()) : true).collect(Collectors.toList());
 				} else {
 					result = "Specificare i destinatari";
 				}
-				
+
 				List<String> sent = new ArrayList<String>(); 
 				for(int i = 0; i < persons.size(); i++) {
 					Person p = persons.get(i);
@@ -171,7 +172,9 @@ public class MailingController {
 			        	toListCCN = new ArrayList<>();
 			        }
 				}
-				result = "Email inviata a " + sent.size() + " indirizzi (su " + alreadySent.size() + " totali)";
+				result = "Email inviata a " + sent.size() + " indirizzi (su " + alreadySent.size() + " totali)"
+					+ (personsWithNoValidEmail.isEmpty() ? "" : "<br/><h3>ATTENZIONE trovate persone con email non valide</h3>: "
+						+ personsWithNoValidEmail.stream().map(person -> person.getName() + " " + person.getSurname() + ", ").reduce("", String::concat));
 			}
 		} else {
 			
@@ -184,10 +187,16 @@ public class MailingController {
 				}
 			}
 			try {
-    			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, attachments, mimeTypes, true);
-    			
-    			result = "Email inviata a " + alreadySent.size() + " indirizzi";
-    			
+
+				String checkMessage = checkEmailAddresses(toListCCN);
+				if ( ! "".equals(checkMessage)) {
+					result = "Errore nell'invio. " + checkMessage;
+				} else {
+
+					mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, attachments, mimeTypes, true);
+
+					result = "Email inviata a " + alreadySent.size() + " indirizzi";
+				}
     		} catch (Exception e) {
     			
     			log.info("Cannot send mailing: {}", e.getMessage());
@@ -201,5 +210,21 @@ public class MailingController {
 		redirectAttributes.addAttribute("result", result);
         return "redirect:/mailing";
     }
+
+    static String checkEmailAddresses(List<String> emailAddresses) {
+		String message = "";
+		for (String emailAddress: emailAddresses ) {
+			if ( ! isEmailValid(emailAddress)){
+				message += " Email " + emailAddress + " not valid.";
+			}
+		}
+		return message;
+	}
+
+	static boolean isEmailValid(String email) {
+		//String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+		//return email.matches(regex);
+		return VALID_EMAIL_ADDRESS_REGEX.matcher(email).find();
+	}
 	
 }

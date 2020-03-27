@@ -4,3 +4,6 @@
 .project
 .classpath
 .metadata/
+.idea/
+*.iml
+etc/3dc.properties
