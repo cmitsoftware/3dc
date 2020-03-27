@@ -244,7 +244,7 @@ public class PersonDAO extends BaseHibernateDAO{
 		dc.add(Restrictions.ge("registrationDate", yearStart.getTime()));
 		dc.add(Restrictions.or()
 				.add(Restrictions.isNull("email"))
-				.add(Restrictions.eq("email"))
+				.add(Restrictions.eq("email",""))
 				.add(Restrictions.not(Restrictions.like("email", "%@%"))));
 
 		return findByCriteria(dc);
