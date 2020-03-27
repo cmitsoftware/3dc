@@ -16,7 +16,7 @@
         <version.standard.taglibs>1.1.2</version.standard.taglibs>
         <version.commons.logging>1.1.1</version.commons.logging>
         <version.hibernate>5.1.3.Final</version.hibernate>
-		<veersion.mysql>5.1.6</veersion.mysql>
+		<version.mysql>5.1.6</version.mysql>
     </properties>
     
     <profiles>
@@ -163,12 +163,14 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.13</version>
 		</dependency>
-		
+
+		<!--
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.3.1</version>
 		</dependency>
+		-->
         <dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-email</artifactId>
