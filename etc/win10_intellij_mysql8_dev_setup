@@ -1,0 +1,19 @@
+--------------------------------------------------------------------
+External properties file
+--------------------------------------------------------------------
+- moved 3dc.properties file under a new folder created for containing configuration file (e.g in C:\Users\giovanni.saba\workspace\3dc-configuration)
+- (added in .gitignore etc/3dc.properties to not store in git credentials accidentally)
+
+--------------------------------------------------------------------
+Intellij
+--------------------------------------------------------------------
+- added SmartTomcat as Configuration plugin (download SmartTomcat and move its content under "plugin" folder of Intellij)
+- Set jkd 1.8 File -> Project Structure -> Project Settings -> Project
+- in run/Debug Configurations create a new SmartTomcat configuration. Add as ENV property the path to folder containing the configuration file
+    (e.g. ENV property -> PROPERTIES_PATH=C:\Users\giovanni.saba\workspace\3dc-configuration)
+
+--------------------------------------------------------------------
+MySQL 8
+--------------------------------------------------------------------
+- in pom.xml: <version.mysql>8.0.11</version.mysql>
+- append "?characterEncoding=utf8&useLegacyDatetimeCode=false&serverTimezone=UTC" to  mysql connection URL in 3dc.properties file
