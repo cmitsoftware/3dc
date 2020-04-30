@@ -127,9 +127,16 @@ public class PersonController {
 			if(!StringUtils.isEmpty(request.getParameter("freeEntryDate"))) {
 				person.setFreeEntryDate(sdf.parse(request.getParameter("freeEntryDate")));
 			}
-			person.setCf(request.getParameter("cf"));
-			person.setCity(request.getParameter("city"));
-			person.setEmail(request.getParameter("email"));
+			if(!StringUtils.isEmpty(request.getParameter("cf"))) {
+				person.setCf(request.getParameter("cf").trim());
+			}
+			if(!StringUtils.isEmpty(request.getParameter("city"))) {
+				person.setCity(request.getParameter("city").trim());
+			}
+			if(!StringUtils.isEmpty(request.getParameter("email"))) {
+				person.setEmail(request.getParameter("email").trim());
+			}
+			
 			if("on".equals(request.getParameter("mailing"))){
 				person.setMailing(true);
 			} else {

@@ -80,14 +80,10 @@ public class ImportController {
 		
 		try {
 
-			MultipartFile fFile = file[0];
-//			File tmpFile = new File(tmpUserPath + File.separator + fFile.getOriginalFilename());
+			MultipartFile multipartFile = file[0];
 			File tmpFile = new File(tmpUserPath + File.separator + UUID.randomUUID().toString());
 			
-//			File tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + fFile.getOriginalFilename());
-//			tmpFile = new File("E:\\michele\\temp\\3dc\\tmp" + File.separator + UUID.randomUUID().toString());
-			
-			fFile.transferTo(tmpFile);
+			multipartFile.transferTo(tmpFile);
 			
 			OPCPackage opcPackage = OPCPackage.open(tmpFile);
 			workbook = new XSSFWorkbook(opcPackage);
@@ -99,6 +95,7 @@ public class ImportController {
 			if (rowIterator.hasNext()) {
 				rowIterator.next();
 			}
+			
 
 			while (rowIterator.hasNext()) {
 				
@@ -466,6 +463,12 @@ public class ImportController {
 					} else {
 						number = personDao.getNextNumber() + 1;
 					}
+					
+					if(createNewPerson && 
+							(StringUtils.isEmpty(name) || StringUtils.isEmpty(surname))) {
+						throw new Exception("Riga " + row.getRowNum() + ": impossibile creare climber senza nome e cognome");
+					}
+					
 					person.setNumber(number);
 					person.setSurname(surname);
 					person.setName(name);
@@ -482,8 +485,6 @@ public class ImportController {
 					person.setAffiliationDate(affiliationDate);
 					person.setFirstRegistrationDate(firstRegistrationDate);
 					person.setApprovalDate(approvalDate);
-					
-//					log.debug(person.toString());
 					
 					if(createNewPerson) {
 						log.info("Creating new person with number {}", number);
