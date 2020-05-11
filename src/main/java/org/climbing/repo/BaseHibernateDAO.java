@@ -31,6 +31,7 @@ public class BaseHibernateDAO {
 		log.debug("find by criteria {}", detached.toString());
 		try {
 			Criteria criteria = detached.getExecutableCriteria(sessionFactory.getCurrentSession());
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			return criteria.list();
 		} catch (RuntimeException re) {
 			log.error("find by criteria failed {}", re);
@@ -43,6 +44,7 @@ public class BaseHibernateDAO {
 			Criteria criteria = detached.getExecutableCriteria(sessionFactory.getCurrentSession());	
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(length);
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			return criteria.list();
 		} catch (RuntimeException re) {
 			re.printStackTrace();

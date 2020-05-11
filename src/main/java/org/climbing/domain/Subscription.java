@@ -11,7 +11,7 @@ public class Subscription implements java.io.Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL, optional=true, fetch = FetchType.EAGER)
     @JoinColumn(name="person_id", nullable=false)
     private Person person;
 

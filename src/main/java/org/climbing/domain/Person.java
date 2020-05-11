@@ -4,6 +4,7 @@ package org.climbing.domain;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -46,7 +47,7 @@ public class Person implements java.io.Serializable {
 	//Data fine abbonamento custom
 	private Date customSubscriptionEndDate;
 	//lista di abbonamenti della persona
-	private List<Subscription> subscriptions;
+	private Set<Subscription> subscriptions;
 	
 	private Boolean mailing;
 	private Integer number;
@@ -267,12 +268,12 @@ public class Person implements java.io.Serializable {
 	}
 
 	//@OneToMany(mappedBy="subscriptionId.person", fetch = FetchType.EAGER)
-	@OneToMany(mappedBy="person", fetch = FetchType.EAGER)
-	public List<Subscription> getSubscriptions() {
+	@OneToMany(mappedBy="person", fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+	public Set<Subscription> getSubscriptions() {
 		return subscriptions;
 	}
 
-	public void setSubscriptions(List<Subscription> subscriptions) {
+	public void setSubscriptions(Set<Subscription> subscriptions) {
 		this.subscriptions = subscriptions;
 	}
 

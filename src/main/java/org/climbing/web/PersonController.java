@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.climbing.domain.Person;
+import org.climbing.domain.Subscription;
 import org.climbing.repo.PersonDAO;
 import org.climbing.security.ClimbingUserDetails;
 import org.climbing.web.obj.PersonObj;
@@ -54,6 +55,12 @@ public class PersonController {
 		Person p = new Person();
 		if(id != null) {
 			p = personDao.findById(id);
+
+
+			log.info(p.getSubscriptions() != null ? "" + p.getSubscriptions().size(): " null found");
+			for (Subscription sub : (p.getSubscriptions()!=null ? p.getSubscriptions() : new ArrayList<Subscription>())  ) {
+				log.info("Subscription " + sub.getTypeName() + sub.getEndDate() + sub.getStartDate());
+			}
 		}
 		model.put("person", p);
 		return "person-detail";
