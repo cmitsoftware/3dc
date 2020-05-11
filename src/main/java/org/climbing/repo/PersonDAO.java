@@ -1,10 +1,13 @@
 package org.climbing.repo;
 
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.climbing.domain.Person;
+import org.climbing.domain.Subscription;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
@@ -12,6 +15,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +58,18 @@ public class PersonDAO extends BaseHibernateDAO{
     public Person save(Person transientInstance) {
 		log.debug("saving Person instance");
 		try {
+
+			// delete persisted subscriptions not anymore needed (link to person removed)
+			Set<Subscription> subscriptions = new HashSet<>();
+			for (Subscription subscription: transientInstance.getSubscriptions()) {
+				if (subscription.getId() != null && subscription.getPerson() == null) {
+					getSession().delete(subscription);
+				} else {
+					subscriptions.add(subscription);
+				}
+			}
+			transientInstance.setSubscriptions(subscriptions);
+
 			getSession().saveOrUpdate(transientInstance);
 			log.debug("save successful");
 		} catch (RuntimeException re) {

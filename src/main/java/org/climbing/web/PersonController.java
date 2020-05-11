@@ -2,8 +2,7 @@ package org.climbing.web;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -158,6 +157,30 @@ public class PersonController {
 				person.setSubscriptionDate(sdf.parse(request.getParameter("subscriptionDate")));
 			}
 			person.setSurname(request.getParameter("surname"));
+
+
+			/*
+			// TODO set person to null to subscriptions to remove, and update existing ones ckecking the type_name
+			if (person.getSubscriptions() == null) {
+				person.setSubscriptions(new HashSet<>());
+			}
+
+			for (Subscription sub: person.getSubscriptions() ) {
+				if (sub.getTypeName().equals("prova2")) {
+					sub.setPerson(null);
+				} else {
+					sub.setTypeName(sub.getTypeName()+"_mod");
+				}
+			}
+
+			Subscription subscription = new Subscription();
+			subscription.setPerson(person);
+			subscription.setTypeName("prova_mod");
+			subscription.setEndDate(new Date());
+			subscription.setStartDate(new Date());
+			person.getSubscriptions().add(subscription);
+
+			 */
 
 			person = personDao.save(person);
 			model.addAttribute("person", person);
