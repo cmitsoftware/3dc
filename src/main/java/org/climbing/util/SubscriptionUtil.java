@@ -18,6 +18,11 @@ public class SubscriptionUtil {
 
     private final static Integer MAX_NUMBER_OF_SUBSCRIPTION_TYPES = 5;
     private final static String SUBSCRIPTION_TYPE_CONFIGURATION_KEY_PREFIX = "subscription_type_";
+    private final static String SUBSCRIPTION_TYPE_CONFIGURATION_VALUE_NAME = "name";
+    private final static String SUBSCRIPTION_TYPE_CONFIGURATION_VALUE_STARTMONTH = "start_month";
+    private final static String SUBSCRIPTION_TYPE_CONFIGURATION_VALUE_ENDMONTH = "end_month";
+
+    private Integer savedSubscriptionTypesNumber = -1;
 
     @Autowired
     private ConfigurationsDAO configurationsDAO;
@@ -32,8 +37,9 @@ public class SubscriptionUtil {
     private List<SubscriptionType> buildSubscriptionTypesFromConfigurations() {
 
         List<SubscriptionType> subscriptionTypes = new ArrayList<>();
+        int i=0;
         try {
-            for (int i = 0; i < MAX_NUMBER_OF_SUBSCRIPTION_TYPES; i++ ) {
+            for (; i < (savedSubscriptionTypesNumber.equals(-1) ? MAX_NUMBER_OF_SUBSCRIPTION_TYPES : savedSubscriptionTypesNumber); i++ ) {
                 Configurations subscriptionTypeConfiguration = configurationsDAO.findByKey(SUBSCRIPTION_TYPE_CONFIGURATION_KEY_PREFIX + i);
                 try {
                     subscriptionTypes.add(buildSubscriptionTypeFromConfiguration(subscriptionTypeConfiguration));
@@ -43,6 +49,8 @@ public class SubscriptionUtil {
             }
         } catch (Exception e) {
             // fetched all the subscription types in DB
+            log.info("Subscriptions types found in configurations: " + i);
+            savedSubscriptionTypesNumber = i;
         }
         return subscriptionTypes;
     }
@@ -63,13 +71,13 @@ public class SubscriptionUtil {
         SubscriptionType subscriptionType = new SubscriptionType();
         for (String element: elements) {
             KeyValue keyValue = getElementKeyValue(element);
-            if (keyValue.getKey().startsWith("name")) {
+            if (keyValue.getKey().startsWith(SUBSCRIPTION_TYPE_CONFIGURATION_VALUE_NAME)) {
                 subscriptionType.setName(keyValue.getValue());
             }
-            if (keyValue.getKey().startsWith("start_month")) {
+            if (keyValue.getKey().startsWith(SUBSCRIPTION_TYPE_CONFIGURATION_VALUE_STARTMONTH)) {
                 subscriptionType.setStartMonth(Integer.parseInt(keyValue.getValue()));
             }
-            if (keyValue.getKey().startsWith("end_month")) {
+            if (keyValue.getKey().startsWith(SUBSCRIPTION_TYPE_CONFIGURATION_VALUE_ENDMONTH)) {
                 subscriptionType.setEndMonth(Integer.parseInt(keyValue.getValue()));
             }
         }

@@ -5,15 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
 
-@Entity(name = "subscription_type")
+
 public class SubscriptionType implements Serializable {
 
-    @Id
-    @Column(name = "name")
     private String name;
-    @Column(name = "start_month")
     private Integer startMonth;
-    @Column(name = "end_month")
     private Integer endMonth;
 
     public String getName() {

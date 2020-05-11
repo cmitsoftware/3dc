@@ -266,7 +266,8 @@ public class Person implements java.io.Serializable {
 		this.customSubscriptionEndDate = customSubscriptionEndDate;
 	}
 
-	@OneToMany(mappedBy="subscriptionId.person", fetch = FetchType.EAGER)
+	//@OneToMany(mappedBy="subscriptionId.person", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy="person", fetch = FetchType.EAGER)
 	public List<Subscription> getSubscriptions() {
 		return subscriptions;
 	}
