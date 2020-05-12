@@ -6,6 +6,7 @@ create table if not exists subscription  (
     type_name varchar(50) not null,
     start_date date not null,
     end_date date not null,
+    reference_year int not null,
     primary key(id),
 	foreign key(person_id) references person(id),
     UNIQUE KEY(person_id, type_name)

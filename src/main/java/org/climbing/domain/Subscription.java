@@ -25,7 +25,8 @@ public class Subscription implements java.io.Serializable {
     @Column(name = "end_date")
     private Date endDate;
 
-
+    @Column(name = "reference_year")
+    private Integer referenceYear;
 
     public Integer getId() {
         return id;
@@ -43,9 +44,7 @@ public class Subscription implements java.io.Serializable {
         this.person = person;
     }
 
-    public String getTypeName() {
-        return typeName;
-    }
+    public String getTypeName() { return typeName; }
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
@@ -58,4 +57,8 @@ public class Subscription implements java.io.Serializable {
     public Date getEndDate() { return endDate; }
 
     public void setEndDate(Date endDate) { this.endDate = endDate; }
+
+    public Integer getReferenceYear() { return referenceYear; }
+
+    public void setReferenceYear(Integer referenceYear) { this.referenceYear = referenceYear; }
 }

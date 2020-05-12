@@ -14,10 +14,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -37,11 +34,6 @@ public class SubscriptionUtil {
     private static final Logger log = LoggerFactory.getLogger(SubscriptionUtil.class);
 
     public List<SubscriptionType> getSubscriptionTypes() {
-
-        return buildSubscriptionTypesFromConfigurations();
-    }
-
-    private List<SubscriptionType> buildSubscriptionTypesFromConfigurations() {
 
         List<SubscriptionType> subscriptionTypes = new ArrayList<>();
         int i=0;
@@ -122,6 +114,18 @@ public class SubscriptionUtil {
             }
         }
         return false;
+    }
+
+    public Set<Subscription> filterSubscriptions(Set<Subscription> subscriptions) {
+
+        List<SubscriptionType> subscriptionTypes = getSubscriptionTypes();
+        Set<Subscription> filteredSubscriptions = new HashSet<>();
+        for (Subscription subscription : (subscriptions != null ? subscriptions : new ArrayList<Subscription>())){
+            if (subscriptionTypes != null ? subscriptionTypes.contains(subscription.getTypeName()) : false) {
+                filteredSubscriptions.add(subscription);
+            }
+        }
+        return filteredSubscriptions;
     }
 }
 

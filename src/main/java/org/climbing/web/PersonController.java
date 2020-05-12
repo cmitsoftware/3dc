@@ -9,8 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.climbing.domain.Person;
 import org.climbing.domain.Subscription;
+import org.climbing.domain.SubscriptionType;
+import org.climbing.repo.ConfigurationsDAO;
 import org.climbing.repo.PersonDAO;
 import org.climbing.security.ClimbingUserDetails;
+import org.climbing.util.SubscriptionUtil;
 import org.climbing.web.obj.PersonObj;
 import org.climbing.web.obj.PersonSearchResult;
 import org.slf4j.Logger;
@@ -39,6 +42,9 @@ public class PersonController {
 	@Autowired
 	PersonDAO personDao;
 
+	@Autowired
+	SubscriptionUtil subscriptionUtil;
+
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	
 	@RequestMapping(method=RequestMethod.GET)
@@ -54,15 +60,33 @@ public class PersonController {
 		Person p = new Person();
 		if(id != null) {
 			p = personDao.findById(id);
-
-
-			log.info(p.getSubscriptions() != null ? "" + p.getSubscriptions().size(): " null found");
-			for (Subscription sub : (p.getSubscriptions()!=null ? p.getSubscriptions() : new ArrayList<Subscription>())  ) {
-				log.info("Subscription " + sub.getTypeName() + sub.getEndDate() + sub.getStartDate());
-			}
 		}
+		p.setSubscriptions(prepareSubscriptions(p.getSubscriptions()));
 		model.put("person", p);
+		//List<SubscriptionType> subscriptionTypes = subscriptionUtil.getSubscriptionTypes();
+		//model.put("subscriptionTypes", subscriptionTypes);
 		return "person-detail";
+	}
+
+	/**
+	 * Create a set of subscriptions compliant with configured set of subscription types,
+	 * taking elements from passed subscriptions or creating new ones.
+	 */
+	private Set<Subscription> prepareSubscriptions(Set<Subscription> subscriptions) {
+
+		Set<Subscription> preparedSubscriptions = new HashSet<>();
+		subscriptions = subscriptions != null ? subscriptions : new HashSet<>();
+		for (SubscriptionType subscriptionType : subscriptionUtil.getSubscriptionTypes()) {
+			Subscription subscription = new Subscription();
+			subscription.setTypeName(subscriptionType.getName());
+			Optional<Subscription> optionalSubscription = subscriptions.stream().filter(subscriptionEl -> subscriptionEl.getTypeName().toLowerCase().equals(subscriptionType.getName().toLowerCase())).findAny();
+			if(optionalSubscription.isPresent()){
+				subscription = optionalSubscription.get();
+				subscriptions.remove(subscription);
+			}
+			preparedSubscriptions.add(subscription);
+		}
+		return preparedSubscriptions;
 	}
 
 	@RequestMapping(method=RequestMethod.GET, params = "method=delete")

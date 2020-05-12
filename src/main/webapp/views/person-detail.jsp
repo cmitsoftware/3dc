@@ -3,6 +3,7 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <tiles:insertDefinition name="3dc.home">
 
@@ -105,17 +106,43 @@
 						                 		value="<fmt:formatDate value='${person.certificationDate}' pattern='dd/MM/yyyy'/>">
 					               		</div>
 						        	</div>
+
 						        	<div class="form-group col-xs-12 col-md-3">
-					               		<label>Data abbonamento</label>
-						               	<div class="input-group">
-						                	<div class="input-group-addon">
-						                   		<i class="fa fa-calendar"></i>
-						                 	</div>
-						                 	<input id="subscriptionDate" name="subscriptionDate" 
-						                 		type="text" class="form-control pull-right active 3dc-date"
-						                 		value="<fmt:formatDate value='${person.subscriptionDate}' pattern='dd/MM/yyyy'/>">
-					               		</div>
-						        	</div>
+                                        <label>Inizio abbonamento Custom</label>
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                            <input id="customSubscriptionStartDate" name="customSubscriptionStartDate"
+                                                type="text" class="form-control pull-right active 3dc-date"
+                                                value="<fmt:formatDate value='${person.customSubscriptionStartDate}' pattern='dd/MM/yyyy'/>">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-xs-12 col-md-3">
+                                        <label>Fine abbonamento Custom</label>
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                            <input id="customSubscriptionEndDate" name="customSubscriptionEndDate"
+                                                type="text" class="form-control pull-right active 3dc-date"
+                                                value="<fmt:formatDate value='${person.customSubscriptionEndDate}' pattern='dd/MM/yyyy'/>">
+                                        </div>
+                                    </div>
+
+						        	<c:forEach var="subscription" items="${person.subscriptions}" varStatus="loopCounter">
+                                        <div class="form-group col-xs-12 col-md-3">
+                                            <label>Anno Inizio abbonamento ${fn:toUpperCase(subscription.typeName)}</label>
+                                            <select id="${subscription.typeName}.referenceYear" name="${subscription.typeName}.referenceYear" class="form-control">
+                                                <option value="">NON ABBONATO</option>
+                                                <c:forEach var="counter" begin="2020" end="2040">
+                                                    <option value="${counter}" <c:out value="${counter == subscription.referenceYear ? 'selected': ''}"/>><c:out value="${counter}"/></option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                    </c:forEach>
+
 						        	<div class="form-group col-xs-12 col-md-3">
 					               		<label>Data affiliazione FASI</label>
 						               	<div class="input-group">
