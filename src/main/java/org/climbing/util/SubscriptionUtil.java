@@ -1,6 +1,7 @@
 package org.climbing.util;
 
 import org.climbing.domain.Configurations;
+import org.climbing.domain.Subscription;
 import org.climbing.domain.SubscriptionType;
 import org.climbing.repo.BaseHibernateDAO;
 import org.climbing.repo.ConfigurationsDAO;
@@ -9,7 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,6 +101,27 @@ public class SubscriptionUtil {
         keyValue.setKey(elements[0].trim().toLowerCase());
         keyValue.setValue(elements[1].trim().toLowerCase());
         return keyValue;
+    }
+
+    public static boolean isSubscriptionCurrentlyValid(Subscription subscription) {
+
+        if (subscription != null) {
+            return isSubscriptionCurrentlyValid(subscription.getStartDate(), subscription.getEndDate());
+        }
+        return false;
+    }
+
+    public static boolean isSubscriptionCurrentlyValid(Date startDate, Date endDate) {
+
+        if (startDate != null && endDate != null) {
+            LocalDate today = LocalDate.now(ZoneId.systemDefault());
+            LocalDate startLocalDate = Instant.ofEpochMilli(startDate.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate endLocalDate = Instant.ofEpochMilli(endDate.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+            if (today.compareTo(startLocalDate) >= 0 && today.compareTo(endLocalDate) <= 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

@@ -4,15 +4,15 @@ create table if not exists subscription  (
 	id int unsigned NOT NULL AUTO_INCREMENT,
     person_id int not null,
     type_name varchar(50) not null,
-    start_date datetime not null,
-    end_date datetime not null,
+    start_date date not null,
+    end_date date not null,
     primary key(id),
 	foreign key(person_id) references person(id),
     UNIQUE KEY(person_id, type_name)
 );
 
-alter table person add column custom_subscription_start_date datetime;
-alter table person add column custom_subscription_end_date datetime;
+alter table person add column custom_subscription_start_date date;
+alter table person add column custom_subscription_end_date date;
 
 insert into configurations values
 ('subscription_type_0', 'name=annuale;start_month=1;end_month=12'),

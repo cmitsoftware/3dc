@@ -1,10 +1,10 @@
 package org.climbing.domain;
 // Generated 14-feb-2016 21.19.01 by Hibernate Tools 4.3.1.Final
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import org.climbing.util.SubscriptionUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -322,6 +322,17 @@ public class Person implements java.io.Serializable {
 	
 	@Transient
 	public boolean subscriptionValid(){
+
+		if (SubscriptionUtil.isSubscriptionCurrentlyValid(this.customSubscriptionStartDate, this.customSubscriptionEndDate)) {
+			return true;
+		}
+		for (Subscription subscription: (this.subscriptions != null ? this.subscriptions : new ArrayList<Subscription>())) {
+			if (SubscriptionUtil.isSubscriptionCurrentlyValid(subscription)) {
+				return true;
+			}
+		}
+
+		/*
 		if(this.subscriptionDate != null) {
 			Calendar startYear = Calendar.getInstance();
 			startYear.set(Calendar.MONTH, 0);
@@ -334,7 +345,33 @@ public class Person implements java.io.Serializable {
 				return true;
 			}
 		}
+	 	*/
 		return false;
+	}
+
+	public static void main(String... args) {
+
+		Calendar todayEndOfDay = Calendar.getInstance();
+		todayEndOfDay.set(Calendar.HOUR_OF_DAY, 23);
+		todayEndOfDay.set(Calendar.MINUTE, 59);
+		todayEndOfDay.set(Calendar.SECOND, 59);
+		todayEndOfDay.set(Calendar.MILLISECOND, 999);
+
+		Calendar todayStartOfDay = Calendar.getInstance();
+		todayStartOfDay.set(Calendar.HOUR_OF_DAY, 00);
+		todayStartOfDay.set(Calendar.MINUTE, 00);
+		todayStartOfDay.set(Calendar.SECOND, 00);
+		todayStartOfDay.set(Calendar.MILLISECOND, 000);
+
+		System.out.println(todayStartOfDay);
+		System.out.println(todayEndOfDay);
+		System.out.println(todayStartOfDay.getTime());
+		System.out.println(todayEndOfDay.getTime());
+		System.out.println(todayStartOfDay.getTimeInMillis());
+		System.out.println(todayEndOfDay.getTimeInMillis());
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+		System.out.println(simpleDateFormat.format(new Date()));
 	}
 	
 	@Transient
