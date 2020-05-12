@@ -127,6 +127,37 @@ public class SubscriptionUtil {
         }
         return filteredSubscriptions;
     }
+
+    public Subscription buildSubscriptionFromType(SubscriptionType subscriptionType, Integer referenceYear) {
+
+        Subscription subscription = new Subscription();
+        subscription.setTypeName(subscriptionType.getName());
+        subscription.setReferenceYear(referenceYear);
+        Calendar startDate = Calendar.getInstance();
+        startDate.set(Calendar.YEAR, referenceYear);
+        startDate.set(Calendar.DAY_OF_MONTH, 1);
+        startDate.set(Calendar.MONTH, subscriptionType.getStartMonth()-1);
+        startDate.set(Calendar.HOUR_OF_DAY, 6);
+        subscription.setStartDate(new Date(startDate.getTimeInMillis()));
+        Integer monthsOfValidityOfSubscriptionType = getMonthsOfValidityOfSubscriptionType(subscriptionType);
+        Calendar endDate = (Calendar)startDate.clone();
+        endDate.add(Calendar.MONTH, monthsOfValidityOfSubscriptionType-1);
+        endDate.set(Calendar.DAY_OF_MONTH, endDate.getActualMaximum(Calendar.DAY_OF_MONTH)); //set to last day of month
+        subscription.setEndDate(new Date(endDate.getTimeInMillis()));
+        return subscription;
+    }
+
+    private Integer getMonthsOfValidityOfSubscriptionType(SubscriptionType subscriptionType) {
+        Integer startMonth = subscriptionType.getStartMonth();
+        Integer endMonth = subscriptionType.getEndMonth();
+        if (endMonth > startMonth) {
+            return (endMonth - startMonth) + 1;
+        } else if (endMonth == startMonth) {
+            return  1;
+        } else {
+            return ((12-startMonth) + endMonth) + 1;
+        }
+    }
 }
 
 class KeyValue {

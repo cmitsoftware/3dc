@@ -79,7 +79,8 @@ public class PersonController {
 		for (SubscriptionType subscriptionType : subscriptionUtil.getSubscriptionTypes()) {
 			Subscription subscription = new Subscription();
 			subscription.setTypeName(subscriptionType.getName());
-			Optional<Subscription> optionalSubscription = subscriptions.stream().filter(subscriptionEl -> subscriptionEl.getTypeName().toLowerCase().equals(subscriptionType.getName().toLowerCase())).findAny();
+			Optional<Subscription> optionalSubscription = subscriptions.stream().filter(
+					subscriptionEl -> subscriptionEl.getTypeName().toLowerCase().equals(subscriptionType.getName().toLowerCase())).findAny();
 			if(optionalSubscription.isPresent()){
 				subscription = optionalSubscription.get();
 				subscriptions.remove(subscription);
@@ -177,34 +178,51 @@ public class PersonController {
 			if(!"".equals(request.getParameter("registrationDate"))) {
 				person.setRegistrationDate(sdf.parse(request.getParameter("registrationDate")));
 			}
-			if(!"".equals(request.getParameter("subscriptionDate"))) {
-				person.setSubscriptionDate(sdf.parse(request.getParameter("subscriptionDate")));
-			}
+			//if(!"".equals(request.getParameter("subscriptionDate"))) {
+			//	person.setSubscriptionDate(sdf.parse(request.getParameter("subscriptionDate")));
+			//}
 			person.setSurname(request.getParameter("surname"));
-
-
-			/*
-			// TODO set person to null to subscriptions to remove, and update existing ones ckecking the type_name
-			if (person.getSubscriptions() == null) {
-				person.setSubscriptions(new HashSet<>());
+			if(!"".equals(request.getParameter("customSubscriptionStartDate"))) {
+				person.setCustomSubscriptionStartDate(sdf.parse(request.getParameter("customSubscriptionStartDate")));
+			}
+			if(!"".equals(request.getParameter("customSubscriptionEndDate"))) {
+				person.setCustomSubscriptionEndDate(sdf.parse(request.getParameter("customSubscriptionEndDate")));
 			}
 
-			for (Subscription sub: person.getSubscriptions() ) {
-				if (sub.getTypeName().equals("prova2")) {
-					sub.setPerson(null);
-				} else {
-					sub.setTypeName(sub.getTypeName()+"_mod");
+			Set<Subscription> formSubscriptions = new HashSet<>();
+			List<SubscriptionType> subscriptionTypes = subscriptionUtil.getSubscriptionTypes();
+			for (SubscriptionType subscriptionType: subscriptionTypes) {
+				String parameter = request.getParameter(subscriptionType.getName()+".referenceYear");
+				if(parameter != null ? !"".equals(parameter) : false) {
+					Integer referenceYear = Integer.parseInt(parameter);
+					Subscription subscription = subscriptionUtil.buildSubscriptionFromType(subscriptionType, referenceYear);
+					subscription.setPerson(person);
+					formSubscriptions.add(subscription);
 				}
 			}
 
-			Subscription subscription = new Subscription();
-			subscription.setPerson(person);
-			subscription.setTypeName("prova_mod");
-			subscription.setEndDate(new Date());
-			subscription.setStartDate(new Date());
-			person.getSubscriptions().add(subscription);
+			for (Subscription sessionSubscription: (person.getSubscriptions() != null ? person.getSubscriptions() : new ArrayList<Subscription>())) {
+				Optional<Subscription> optionalSubscription = formSubscriptions.stream().filter(
+						subscriptionEl -> subscriptionEl.getTypeName().equals(sessionSubscription.getTypeName())).findAny();
+				if (optionalSubscription.isPresent()) {
+					//update subscription
+					Subscription formSubscription = optionalSubscription.get();
+					sessionSubscription.setStartDate(formSubscription.getStartDate());
+					sessionSubscription.setReferenceYear(formSubscription.getReferenceYear());
+					sessionSubscription.setEndDate(formSubscription.getEndDate());
+					formSubscriptions.remove(formSubscription);
+				} else {
+					//delete subscription, removing the person link will force Dao delete it
+					sessionSubscription.setPerson(null);
+				}
+			}
 
-			 */
+			//add new subscriptions
+			if (person.getSubscriptions()!=null) {
+				person.getSubscriptions().addAll(formSubscriptions);
+			} else{
+				person.setSubscriptions(formSubscriptions);
+			}
 
 			person = personDao.save(person);
 			model.addAttribute("person", person);
