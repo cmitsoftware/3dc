@@ -475,7 +475,7 @@ public class ImportController {
 					person.setPhone(phone);
 					person.setRegistrationDate(registrationDate);
 					person.setCertificationDate(certificationDate);
-					person.setSubscriptionDate(subscriptionDate);
+					//person.setSubscriptionDate(subscriptionDate);
 					person.setFreeEntryDate(freeEntryDate);
 					person.setCf(cf);
 					person.setEmail(email);

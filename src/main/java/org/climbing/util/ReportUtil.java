@@ -3,6 +3,8 @@ package org.climbing.util;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -11,6 +13,8 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.climbing.domain.Person;
+import org.climbing.domain.Subscription;
+import org.climbing.domain.SubscriptionType;
 import org.climbing.repo.PersonDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,610 +24,166 @@ public class ReportUtil {
 
 	@Autowired
 	PersonDAO personDao;
+
+	@Autowired
+	SubscriptionUtil subscriptionUtil;
 	
 	public byte[] buildGeneralReport() {
-
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		try {
-			
-			@SuppressWarnings("resource")
-			XSSFWorkbook wb = new XSSFWorkbook();
-	        XSSFSheet sheetsData = wb.createSheet("Report generale");
-	        
-	        XSSFFont titlesFont = wb.createFont();
-	        titlesFont.setBold(true);
-	        CellStyle titlesStyle = wb.createCellStyle();
-	        titlesStyle.setAlignment(CellStyle.ALIGN_LEFT);
-	        titlesStyle.setFont(titlesFont);
-	        
-	        int rowOffset = 0;
-	        int colOffset = 0;
-	        Row titlesRow = sheetsData.createRow((short)rowOffset);
-	        Cell title1Cell = titlesRow.createCell(colOffset);
-	        title1Cell.setCellValue("N.");
-	        title1Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title2Cell = titlesRow.createCell(colOffset);
-	        title2Cell.setCellValue("Cognome");
-	        title2Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title3Cell = titlesRow.createCell(colOffset);
-	        title3Cell.setCellValue("Nome");
-	        title3Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title4Cell = titlesRow.createCell(colOffset);
-	        title4Cell.setCellValue("Telefono");
-	        title4Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title5Cell = titlesRow.createCell(colOffset);
-	        title5Cell.setCellValue("Data iscrizione 3dc annuale");
-	        title5Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title6Cell = titlesRow.createCell(colOffset);
-	        title6Cell.setCellValue("Data certificato medico");
-	        title6Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title7Cell = titlesRow.createCell(colOffset);
-	        title7Cell.setCellValue("Data abbonamento");
-	        title7Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title8Cell = titlesRow.createCell(colOffset);
-	        title8Cell.setCellValue("Data prova gratuita");
-	        title8Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title9Cell = titlesRow.createCell(colOffset);
-	        title9Cell.setCellValue("Codice fiscale");
-	        title9Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title10Cell = titlesRow.createCell(colOffset);
-	        title10Cell.setCellValue("Email");
-	        title10Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title11Cell = titlesRow.createCell(colOffset);
-	        title11Cell.setCellValue("Paese");
-	        title11Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title12Cell = titlesRow.createCell(colOffset);
-	        title12Cell.setCellValue("Indirizzo");
-	        title12Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title13Cell = titlesRow.createCell(colOffset);
-	        title13Cell.setCellValue("Data nascita");
-	        title13Cell.setCellStyle(titlesStyle);
-
-	        colOffset++;
-	        Cell title14Cell = titlesRow.createCell(colOffset);
-	        title14Cell.setCellValue("Data affiliazione FASI");
-	        title14Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title15Cell = titlesRow.createCell(colOffset);
-	        title15Cell.setCellValue("Data richiesta prima iscrizione");
-	        title15Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title16Cell = titlesRow.createCell(colOffset);
-	        title16Cell.setCellValue("Data approvazione 3dc");
-	        title16Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title17Cell = titlesRow.createCell(colOffset);
-	        title17Cell.setCellValue("Data prima registrazione");
-	        title17Cell.setCellStyle(titlesStyle);
-	        
-	        for(Person p: personDao.findAll("surname", "asc")) {
-	        	
-	        	rowOffset++;
-	        	colOffset = 0;
-		        Row personRow = sheetsData.createRow((short)rowOffset);
-		        Cell cell1 = personRow.createCell(colOffset);
-//		        cell1.setCellValue(p.getId());
-		        if(p.getNumber() != null) {
-		        	cell1.setCellValue(p.getNumber());
-		        }
-		        
-		        colOffset++;
-		        Cell cell2 = personRow.createCell(colOffset);
-		        cell2.setCellValue(p.getSurname() != null ? p.getSurname() : "");
-		        
-		        colOffset++;
-		        Cell cell3 = personRow.createCell(colOffset);
-		        cell3.setCellValue(p.getName() != null ? p.getName() : "");
-		        
-		        colOffset++;
-		        Cell cell4 = personRow.createCell(colOffset);
-		        cell4.setCellValue(p.getPhone() != null ? p.getPhone() : "");
-		        
-		        colOffset++;
-		        Cell cell5 = personRow.createCell(colOffset);
-		        cell5.setCellValue(p.getRegistrationDate() != null ? 
-		        		sdf.format(p.getRegistrationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell6 = personRow.createCell(colOffset);
-		        cell6.setCellValue(p.getCertificationDate() != null ? 
-		        		sdf.format(p.getCertificationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell7 = personRow.createCell(colOffset);
-		        cell7.setCellValue(p.getSubscriptionDate() != null ? 
-		        		sdf.format(p.getSubscriptionDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell8 = personRow.createCell(colOffset);
-		        cell8.setCellValue(p.getFreeEntryDate() != null ? 
-		        		sdf.format(p.getFreeEntryDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell9 = personRow.createCell(colOffset);
-		        cell9.setCellValue(p.getCf()  != null ? p.getCf() : "");
-		        
-		        colOffset++;
-		        Cell cell10 = personRow.createCell(colOffset);
-		        cell10.setCellValue(p.getEmail() != null ? p.getEmail() : "");
-		        
-		        colOffset++;
-		        Cell cell11 = personRow.createCell(colOffset);
-		        cell11.setCellValue(p.getCity() != null ? p.getCity() : "");
-		        
-		        colOffset++;
-		        Cell cell12 = personRow.createCell(colOffset);
-		        cell12.setCellValue(p.getAddress() != null ? p.getAddress() : "");
-		        
-		        colOffset++;
-		        Cell cell13 = personRow.createCell(colOffset);
-		        cell13.setCellValue(p.getBirthDate() != null ? 
-		        		sdf.format(p.getBirthDate()) : "");
-
-		        colOffset++;
-		        Cell cell14 = personRow.createCell(colOffset);
-		        cell14.setCellValue(p.getAffiliationDate() != null ? 
-		        		sdf.format(p.getAffiliationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell15 = personRow.createCell(colOffset);
-		        cell15.setCellValue(p.getFirstRegistrationDate() != null ? 
-		        		sdf.format(p.getFirstRegistrationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell16 = personRow.createCell(colOffset);
-		        cell16.setCellValue(p.getApprovalDate() != null ? 
-		        		sdf.format(p.getApprovalDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell17 = personRow.createCell(colOffset);
-		        cell17.setCellValue(p.getCreationDate() != null ? 
-		        		sdf.format(p.getCreationDate()) : "");
-	        }
-	        
-	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	        try {
-		        wb.write(bos);
-	        } finally {
-	            bos.close();
-	        }
-	        byte[] bytes = bos.toByteArray();
-	        return bytes;
-	        
-		} catch (Exception e) {
+			List<Person> people = personDao.findAll("surname", "asc");
+			return buildReport("Report generale", people);
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	public byte[] buildCurrentYearReport() {
 
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		try {
-			Calendar now = Calendar.getInstance();
-			
-			@SuppressWarnings("resource")
-			XSSFWorkbook wb = new XSSFWorkbook();
-	        XSSFSheet sheetsData = wb.createSheet("Report iscritti " + now.get(Calendar.YEAR));
-	        
-	        XSSFFont titlesFont = wb.createFont();
-	        titlesFont.setBold(true);
-	        CellStyle titlesStyle = wb.createCellStyle();
-	        titlesStyle.setAlignment(CellStyle.ALIGN_LEFT);
-	        titlesStyle.setFont(titlesFont);
-	        
-	        int rowOffset = 0;
-	        int colOffset = 0;
-	        Row titlesRow = sheetsData.createRow((short)rowOffset);
-	        Cell title1Cell = titlesRow.createCell(colOffset);
-	        title1Cell.setCellValue("N.");
-	        title1Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title2Cell = titlesRow.createCell(colOffset);
-	        title2Cell.setCellValue("Cognome");
-	        title2Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title3Cell = titlesRow.createCell(colOffset);
-	        title3Cell.setCellValue("Nome");
-	        title3Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title4Cell = titlesRow.createCell(colOffset);
-	        title4Cell.setCellValue("Telefono");
-	        title4Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title5Cell = titlesRow.createCell(colOffset);
-	        title5Cell.setCellValue("Data iscrizione 3dc annuale");
-	        title5Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title6Cell = titlesRow.createCell(colOffset);
-	        title6Cell.setCellValue("Data certificato medico");
-	        title6Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title7Cell = titlesRow.createCell(colOffset);
-	        title7Cell.setCellValue("Data abbonamento");
-	        title7Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title8Cell = titlesRow.createCell(colOffset);
-	        title8Cell.setCellValue("Data prova gratuita");
-	        title8Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title9Cell = titlesRow.createCell(colOffset);
-	        title9Cell.setCellValue("Codice fiscale");
-	        title9Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title10Cell = titlesRow.createCell(colOffset);
-	        title10Cell.setCellValue("Email");
-	        title10Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title11Cell = titlesRow.createCell(colOffset);
-	        title11Cell.setCellValue("Paese");
-	        title11Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title12Cell = titlesRow.createCell(colOffset);
-	        title12Cell.setCellValue("Indirizzo");
-	        title12Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title13Cell = titlesRow.createCell(colOffset);
-	        title13Cell.setCellValue("Data nascita");
-	        title13Cell.setCellStyle(titlesStyle);
-
-	        colOffset++;
-	        Cell title14Cell = titlesRow.createCell(colOffset);
-	        title14Cell.setCellValue("Data affiliazione FASI");
-	        title14Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title15Cell = titlesRow.createCell(colOffset);
-	        title15Cell.setCellValue("Data richiesta prima iscrizione");
-	        title15Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title16Cell = titlesRow.createCell(colOffset);
-	        title16Cell.setCellValue("Data approvazione 3dc");
-	        title16Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title17Cell = titlesRow.createCell(colOffset);
-	        title17Cell.setCellValue("Data prima registrazione");
-	        title17Cell.setCellStyle(titlesStyle);
-	        
-	        for(Person p: personDao.findThisYearSubscribed("surname", "asc")) {
-	        	
-	        	rowOffset++;
-	        	colOffset = 0;
-		        Row personRow = sheetsData.createRow((short)rowOffset);
-		        Cell cell1 = personRow.createCell(colOffset);
-//		        cell1.setCellValue(p.getId());
-		        if(p.getNumber() != null) {
-		        	cell1.setCellValue(p.getNumber());
-		        }
-		        
-		        colOffset++;
-		        Cell cell2 = personRow.createCell(colOffset);
-		        cell2.setCellValue(p.getSurname() != null ? p.getSurname() : "");
-		        
-		        colOffset++;
-		        Cell cell3 = personRow.createCell(colOffset);
-		        cell3.setCellValue(p.getName() != null ? p.getName() : "");
-		        
-		        colOffset++;
-		        Cell cell4 = personRow.createCell(colOffset);
-		        cell4.setCellValue(p.getPhone() != null ? p.getPhone() : "");
-		        
-		        colOffset++;
-		        Cell cell5 = personRow.createCell(colOffset);
-		        cell5.setCellValue(p.getRegistrationDate() != null ? 
-		        		sdf.format(p.getRegistrationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell6 = personRow.createCell(colOffset);
-		        cell6.setCellValue(p.getCertificationDate() != null ? 
-		        		sdf.format(p.getCertificationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell7 = personRow.createCell(colOffset);
-		        cell7.setCellValue(p.getSubscriptionDate() != null ? 
-		        		sdf.format(p.getSubscriptionDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell8 = personRow.createCell(colOffset);
-		        cell8.setCellValue(p.getFreeEntryDate() != null ? 
-		        		sdf.format(p.getFreeEntryDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell9 = personRow.createCell(colOffset);
-		        cell9.setCellValue(p.getCf()  != null ? p.getCf() : "");
-		        
-		        colOffset++;
-		        Cell cell10 = personRow.createCell(colOffset);
-		        cell10.setCellValue(p.getEmail() != null ? p.getEmail() : "");
-		        
-		        colOffset++;
-		        Cell cell11 = personRow.createCell(colOffset);
-		        cell11.setCellValue(p.getCity() != null ? p.getCity() : "");
-		        
-		        colOffset++;
-		        Cell cell12 = personRow.createCell(colOffset);
-		        cell12.setCellValue(p.getAddress() != null ? p.getAddress() : "");
-		        
-		        colOffset++;
-		        Cell cell13 = personRow.createCell(colOffset);
-		        cell13.setCellValue(p.getBirthDate() != null ? 
-		        		sdf.format(p.getBirthDate()) : "");
-
-		        colOffset++;
-		        Cell cell14 = personRow.createCell(colOffset);
-		        cell14.setCellValue(p.getAffiliationDate() != null ? 
-		        		sdf.format(p.getAffiliationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell15 = personRow.createCell(colOffset);
-		        cell15.setCellValue(p.getFirstRegistrationDate() != null ? 
-		        		sdf.format(p.getFirstRegistrationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell16 = personRow.createCell(colOffset);
-		        cell16.setCellValue(p.getApprovalDate() != null ? 
-		        		sdf.format(p.getApprovalDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell17 = personRow.createCell(colOffset);
-		        cell17.setCellValue(p.getCreationDate() != null ? 
-		        		sdf.format(p.getCreationDate()) : "");
-	        }
-	        
-	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	        try {
-		        wb.write(bos);
-	        } finally {
-	            bos.close();
-	        }
-	        byte[] bytes = bos.toByteArray();
-	        return bytes;
-	        
-		} catch (Exception e) {
+			List<Person> people = personDao.findThisYearSubscribed("surname", "asc");
+			return buildReport("Report iscritti " + Calendar.getInstance().get(Calendar.YEAR), people);
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	public byte[] buildPersonsWithoutCertificateReport() {
 
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		try {
-			
-			@SuppressWarnings("resource")
-			XSSFWorkbook wb = new XSSFWorkbook();
-	        XSSFSheet sheetsData = wb.createSheet("Contatori");
-	        
-	        XSSFFont titlesFont = wb.createFont();
-	        titlesFont.setBold(true);
-	        CellStyle titlesStyle = wb.createCellStyle();
-	        titlesStyle.setAlignment(CellStyle.ALIGN_LEFT);
-	        titlesStyle.setFont(titlesFont);
-	        
-	        int rowOffset = 0;
-	        int colOffset = 0;
-	        Row titlesRow = sheetsData.createRow((short)rowOffset);
-	        Cell title1Cell = titlesRow.createCell(colOffset);
-	        title1Cell.setCellValue("N.");
-	        title1Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title2Cell = titlesRow.createCell(colOffset);
-	        title2Cell.setCellValue("Cognome");
-	        title2Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title3Cell = titlesRow.createCell(colOffset);
-	        title3Cell.setCellValue("Nome");
-	        title3Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title4Cell = titlesRow.createCell(colOffset);
-	        title4Cell.setCellValue("Telefono");
-	        title4Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title5Cell = titlesRow.createCell(colOffset);
-	        title5Cell.setCellValue("Data iscrizione 3dc annuale");
-	        title5Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title6Cell = titlesRow.createCell(colOffset);
-	        title6Cell.setCellValue("Data certificato medico");
-	        title6Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title7Cell = titlesRow.createCell(colOffset);
-	        title7Cell.setCellValue("Data abbonamento");
-	        title7Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title8Cell = titlesRow.createCell(colOffset);
-	        title8Cell.setCellValue("Data prova gratuita");
-	        title8Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title9Cell = titlesRow.createCell(colOffset);
-	        title9Cell.setCellValue("Codice fiscale");
-	        title9Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title10Cell = titlesRow.createCell(colOffset);
-	        title10Cell.setCellValue("Email");
-	        title10Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title11Cell = titlesRow.createCell(colOffset);
-	        title11Cell.setCellValue("Paese");
-	        title11Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title12Cell = titlesRow.createCell(colOffset);
-	        title12Cell.setCellValue("Indirizzo");
-	        title12Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title13Cell = titlesRow.createCell(colOffset);
-	        title13Cell.setCellValue("Data nascita");
-	        title13Cell.setCellStyle(titlesStyle);
-
-	        colOffset++;
-	        Cell title14Cell = titlesRow.createCell(colOffset);
-	        title14Cell.setCellValue("Data affiliazione FASI");
-	        title14Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title15Cell = titlesRow.createCell(colOffset);
-	        title15Cell.setCellValue("Data richiesta prima iscrizione");
-	        title15Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title16Cell = titlesRow.createCell(colOffset);
-	        title16Cell.setCellValue("Data approvazione 3dc");
-	        title16Cell.setCellStyle(titlesStyle);
-	        
-	        colOffset++;
-	        Cell title17Cell = titlesRow.createCell(colOffset);
-	        title17Cell.setCellValue("Data prima registrazione");
-	        title17Cell.setCellStyle(titlesStyle);
-	        
-	        for(Person p: personDao.findPersonsWithoutCertificate(null)) {
-	        	
-	        	rowOffset++;
-	        	colOffset = 0;
-		        Row personRow = sheetsData.createRow((short)rowOffset);
-		        Cell cell1 = personRow.createCell(colOffset);
-//		        cell1.setCellValue(p.getId());
-		        if(p.getNumber() != null) {
-		        	cell1.setCellValue(p.getNumber());
-		        }
-		        
-		        colOffset++;
-		        Cell cell2 = personRow.createCell(colOffset);
-		        cell2.setCellValue(p.getSurname() != null ? p.getSurname() : "");
-		        
-		        colOffset++;
-		        Cell cell3 = personRow.createCell(colOffset);
-		        cell3.setCellValue(p.getName() != null ? p.getName() : "");
-		        
-		        colOffset++;
-		        Cell cell4 = personRow.createCell(colOffset);
-		        cell4.setCellValue(p.getPhone() != null ? p.getPhone() : "");
-		        
-		        colOffset++;
-		        Cell cell5 = personRow.createCell(colOffset);
-		        cell5.setCellValue(p.getRegistrationDate() != null ? 
-		        		sdf.format(p.getRegistrationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell6 = personRow.createCell(colOffset);
-		        cell6.setCellValue(p.getCertificationDate() != null ? 
-		        		sdf.format(p.getCertificationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell7 = personRow.createCell(colOffset);
-		        cell7.setCellValue(p.getSubscriptionDate() != null ? 
-		        		sdf.format(p.getSubscriptionDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell8 = personRow.createCell(colOffset);
-		        cell8.setCellValue(p.getFreeEntryDate() != null ? 
-		        		sdf.format(p.getFreeEntryDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell9 = personRow.createCell(colOffset);
-		        cell9.setCellValue(p.getCf()  != null ? p.getCf() : "");
-		        
-		        colOffset++;
-		        Cell cell10 = personRow.createCell(colOffset);
-		        cell10.setCellValue(p.getEmail() != null ? p.getEmail() : "");
-		        
-		        colOffset++;
-		        Cell cell11 = personRow.createCell(colOffset);
-		        cell11.setCellValue(p.getCity() != null ? p.getCity() : "");
-		        
-		        colOffset++;
-		        Cell cell12 = personRow.createCell(colOffset);
-		        cell12.setCellValue(p.getAddress() != null ? p.getAddress() : "");
-		        
-		        colOffset++;
-		        Cell cell13 = personRow.createCell(colOffset);
-		        cell13.setCellValue(p.getBirthDate() != null ? 
-		        		sdf.format(p.getBirthDate()) : "");
-
-		        colOffset++;
-		        Cell cell14 = personRow.createCell(colOffset);
-		        cell14.setCellValue(p.getAffiliationDate() != null ? 
-		        		sdf.format(p.getAffiliationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell15 = personRow.createCell(colOffset);
-		        cell15.setCellValue(p.getFirstRegistrationDate() != null ? 
-		        		sdf.format(p.getFirstRegistrationDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell16 = personRow.createCell(colOffset);
-		        cell16.setCellValue(p.getApprovalDate() != null ? 
-		        		sdf.format(p.getApprovalDate()) : "");
-		        
-		        colOffset++;
-		        Cell cell17 = personRow.createCell(colOffset);
-		        cell17.setCellValue(p.getCreationDate() != null ? 
-		        		sdf.format(p.getCreationDate()) : "");
-	        }
-	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	        try {
-		        wb.write(bos);
-	        } finally {
-	            bos.close();
-	        }
-	        byte[] bytes = bos.toByteArray();
-	        return bytes;
-	        
-		} catch (Exception e) {
+			List<Person> people = personDao.findPersonsWithoutCertificate(null);
+			return buildReport("Contatori", people);
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 		return null;
 	}
+
+	private byte[] buildReport(String reportName, List<Person> people) throws Exception {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+		@SuppressWarnings("resource")
+		XSSFWorkbook wb = new XSSFWorkbook();
+		XSSFSheet sheetsData = wb.createSheet(reportName);
+
+		XSSFFont titlesFont = wb.createFont();
+		titlesFont.setBold(true);
+		CellStyle titlesStyle = wb.createCellStyle();
+		titlesStyle.setAlignment(CellStyle.ALIGN_LEFT);
+		titlesStyle.setFont(titlesFont);
+
+		int rowOffset = 0;
+		int colOffset = 0;
+		Row titlesRow = sheetsData.createRow((short)rowOffset);
+
+		titlesRow = addCell(titlesRow,"N.", colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Cognome",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Nome",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Telefono",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data iscrizione 3dc annuale",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data certificato medico",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data prova gratuita",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Codice fiscale",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Email",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Paese",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Indirizzo",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data nascita",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data affiliazione FASI",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data richiesta prima iscrizione",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data approvazione 3dc",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data prima registrazione",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data inizio abbonamento Custom",++colOffset, titlesStyle);
+		titlesRow = addCell(titlesRow,"Data fine abbonamento Custom",++colOffset, titlesStyle);
+
+		List<SubscriptionType> subscriptionTypes = subscriptionUtil.getSubscriptionTypes();
+		for (SubscriptionType subscriptionType: subscriptionTypes) {
+			titlesRow = addCell(titlesRow,"Anno di inizio Abbonamento " + subscriptionType.getName(),++colOffset, titlesStyle);
+		}
+
+		for(Person p: people) {
+
+			rowOffset++;
+			colOffset = 0;
+			Row personRow = sheetsData.createRow((short)rowOffset);
+
+			personRow = addCellValueInt(personRow,p.getNumber(),colOffset, null);
+			personRow = addCell(personRow,p.getSurname(),++colOffset, null);
+			personRow = addCell(personRow,p.getName(),++colOffset, null);
+			personRow = addCell(personRow,p.getPhone(),++colOffset, null);
+			personRow = addCellValueDate(personRow,p.getRegistrationDate(),++colOffset, null, sdf);
+			personRow = addCellValueDate(personRow,p.getCertificationDate(),++colOffset, null, sdf);
+			personRow = addCellValueDate(personRow,p.getFreeEntryDate(),++colOffset, null, sdf);
+			personRow = addCell(personRow,p.getCf(),++colOffset, null);
+			personRow = addCell(personRow,p.getEmail(),++colOffset, null);
+			personRow = addCell(personRow,p.getCity(),++colOffset, null);
+			personRow = addCell(personRow,p.getAddress(),++colOffset, null);
+			personRow = addCellValueDate(personRow,p.getBirthDate(),++colOffset, null, sdf);
+			personRow = addCellValueDate(personRow,p.getAffiliationDate(),++colOffset, null, sdf);
+			personRow = addCellValueDate(personRow,p.getFirstRegistrationDate(),++colOffset, null, sdf);
+			personRow = addCellValueDate(personRow,p.getApprovalDate(),++colOffset, null, sdf);
+			personRow = addCellValueDate(personRow,p.getCreationDate(),++colOffset, null, sdf);
+			personRow = addCellValueDate(personRow,p.getCustomSubscriptionStartDate(),++colOffset, null, sdf);
+			personRow = addCellValueDate(personRow,p.getCustomSubscriptionEndDate(),++colOffset, null, sdf);
+
+			for (SubscriptionType subscriptionType: subscriptionTypes) {
+				Subscription subscription = subscriptionUtil.getSubscriptionMatchingType(p.getSubscriptions(), subscriptionType);
+				personRow = addCell(personRow,""+ (subscription != null ? subscription.getReferenceYear() : ""),++colOffset, null);
+			}
+		}
+
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		try {
+			wb.write(bos);
+		} finally {
+			bos.close();
+		}
+		byte[] bytes = bos.toByteArray();
+		return bytes;
+	}
+
+	private Row addCell(Row row, String value, Integer colOffset, CellStyle cellStyle){
+		RowCellPair rowCellPair = addCell(row, colOffset, cellStyle);
+		rowCellPair.getCell().setCellValue(value != null ? value : "");
+		return rowCellPair.getRow();
+	}
+
+	private Row addCellValueInt(Row row, Integer value, Integer colOffset, CellStyle cellStyle){
+		RowCellPair rowCellPair = addCell(row, colOffset, cellStyle);
+		if (value!=null){
+			rowCellPair.getCell().setCellValue(value);
+		}
+		return rowCellPair.getRow();
+	}
+
+	private Row addCellValueDate(Row row, Date value, Integer colOffset, CellStyle cellStyle, SimpleDateFormat sdf){
+		RowCellPair rowCellPair = addCell(row, colOffset, cellStyle);
+		rowCellPair.getCell().setCellValue(value!=null ? sdf.format(value) : "");
+		return rowCellPair.getRow();
+	}
+
+	private RowCellPair addCell(Row row, Integer colOffset, CellStyle cellStyle) {
+		Cell cell = row.createCell(colOffset);
+		if (cellStyle != null) {
+			cell.setCellStyle(cellStyle);
+		}
+		return new RowCellPair(row, cell);
+	}
+}
+
+class RowCellPair {
+
+	Row row;
+	Cell cell;
+
+	public RowCellPair(Row row, Cell cell) {
+		this.row = row;
+		this.cell = cell;
+	}
+
+	public Row getRow() {return row;}
+	public void setRow(Row row) {this.row = row;}
+	public Cell getCell() {return cell;}
+	public void setCell(Cell cell) {this.cell = cell;}
 }

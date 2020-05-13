@@ -120,10 +120,8 @@ public class MailingController {
         			mailUtil.sendMail(fromEmail, fromName, null, null, toListCCN, subject, message, attachments, mimeTypes, true);
         			result = "Email inviata a " + toListCCN.size() + " indirizzi";
         		} catch (Exception e) {
-        			
         			log.info("Cannot send mailing: {}", e.getMessage());
         			e.printStackTrace();
-        			
         		}
 			} else {
 				List<Person> persons = new ArrayList<Person>();
@@ -167,7 +165,6 @@ public class MailingController {
 		        			
 		        			log.info("Cannot send mailing: {}", e.getMessage());
 		        			e.printStackTrace();
-		        			
 		        		}
 			        	toListCCN = new ArrayList<>();
 			        }
@@ -222,8 +219,6 @@ public class MailingController {
 	}
 
 	static boolean isEmailValid(String email) {
-		//String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
-		//return email.matches(regex);
 		return VALID_EMAIL_ADDRESS_REGEX.matcher(email).find();
 	}
 	

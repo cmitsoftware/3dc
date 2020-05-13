@@ -122,7 +122,6 @@ public class PersonDAO extends BaseHibernateDAO{
     	}
     	dc.addOrder(Order.asc("surname"));
     	return findByCriteria(dc);
-    	
     }
     
     public List<Person> findThisYearSubscribed(String order, String direction) {
@@ -143,7 +142,6 @@ public class PersonDAO extends BaseHibernateDAO{
     		}
         }
     	return findByCriteria(dc);
-    	
     }
     
     @SuppressWarnings("unchecked")
@@ -173,28 +171,24 @@ public class PersonDAO extends BaseHibernateDAO{
 		}
     	
     	return findByCriteria(dc, firstResult, maxResults);
-    	
     }
     
     public Long searchCount(String searchToken) {
-	    
-//    	if(!StringUtils.isEmpty(searchToken)) {
-    		DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
-    		
-    		Disjunction filter = Restrictions.disjunction();
-    		filter.add(Restrictions.like("name", "%" + searchToken + "%"));
-    		filter.add(Restrictions.like("surname", "%" + searchToken + "%"));
-    		try {
-    			filter.add(Restrictions.eq("number", Integer.parseInt(searchToken)));
-    		} catch (Exception e) {}
-    		
-    		if(!StringUtils.isEmpty(searchToken)) {
-    			dc.add(filter);
-    		}
-    		
-    		return (long)getCount(dc);
-//    	}
-//    	return (long)0;
+
+		DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
+
+		Disjunction filter = Restrictions.disjunction();
+		filter.add(Restrictions.like("name", "%" + searchToken + "%"));
+		filter.add(Restrictions.like("surname", "%" + searchToken + "%"));
+		try {
+			filter.add(Restrictions.eq("number", Integer.parseInt(searchToken)));
+		} catch (Exception e) {}
+
+		if(!StringUtils.isEmpty(searchToken)) {
+			dc.add(filter);
+		}
+
+		return (long)getCount(dc);
     }
 
 	public Integer getNextNumber() {
@@ -207,7 +201,6 @@ public class PersonDAO extends BaseHibernateDAO{
     	} else {
     		return (Integer)ret;
     	}
-		
 	}
 
 	public List<Person> findMailingAll() {
@@ -218,7 +211,6 @@ public class PersonDAO extends BaseHibernateDAO{
     	dc.add(Restrictions.like("email", "%@%"));
     	
     	return findByCriteria(dc);
-		
 	}
 
 	public List<Person> findMailingAllWithNotValidEmail() {
@@ -246,7 +238,6 @@ public class PersonDAO extends BaseHibernateDAO{
     	dc.add(Restrictions.ge("registrationDate", yearStart.getTime()));
     	
     	return findByCriteria(dc);
-		
 	}
 
 	public List<Person> findMailingRegisteredWithNoValidEmail() {

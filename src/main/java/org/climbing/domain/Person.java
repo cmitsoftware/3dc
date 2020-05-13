@@ -29,7 +29,7 @@ public class Person implements java.io.Serializable {
 	//Data iscrizione annuale
 	private Date registrationDate;
 	//Data abbonamento
-	private Date subscriptionDate;
+	//private Date subscriptionDate;
 	//Data certificato medico
 	private Date certificationDate;
 	//Data affiliazione FASI
@@ -159,15 +159,15 @@ public class Person implements java.io.Serializable {
 		this.registrationDate = registrationDate;
 	}
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "subscription_date", length = 19)
-	public Date getSubscriptionDate() {
-		return this.subscriptionDate;
-	}
+	//@Temporal(TemporalType.TIMESTAMP)
+	//@Column(name = "subscription_date", length = 19)
+	//public Date getSubscriptionDate() {
+	//	return this.subscriptionDate;
+	//}
 
-	public void setSubscriptionDate(Date subscriptionDate) {
-		this.subscriptionDate = subscriptionDate;
-	}
+	//public void setSubscriptionDate(Date subscriptionDate) {
+	//	this.subscriptionDate = subscriptionDate;
+	//}
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "certification_date", length = 19)
@@ -267,7 +267,6 @@ public class Person implements java.io.Serializable {
 		this.customSubscriptionEndDate = customSubscriptionEndDate;
 	}
 
-	//@OneToMany(mappedBy="subscriptionId.person", fetch = FetchType.EAGER)
 	@OneToMany(mappedBy="person", fetch = FetchType.EAGER, cascade=CascadeType.ALL)
 	public Set<Subscription> getSubscriptions() {
 		return subscriptions;
@@ -405,7 +404,7 @@ public class Person implements java.io.Serializable {
 				", cf='" + cf + '\'' +
 				", birthDate=" + birthDate +
 				", registrationDate=" + registrationDate +
-				", subscriptionDate=" + subscriptionDate +
+				//", subscriptionDate=" + subscriptionDate +
 				", certificationDate=" + certificationDate +
 				", affiliationDate=" + affiliationDate +
 				", freeEntryDate=" + freeEntryDate +

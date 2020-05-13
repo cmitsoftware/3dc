@@ -11,7 +11,7 @@ public class PersonObj {
 	private String surname;
 	private String email;
 	private String registrationDate;
-	private String subscriptionDate;
+	//private String subscriptionDate;
 	private String certificationDate;
 	private String freeEntryDate;
 	private Boolean registrationValid;
@@ -28,9 +28,9 @@ public class PersonObj {
 		if(p.getRegistrationDate() != null) {
 			this.registrationDate  = Constants.timeFormat().format(p.getRegistrationDate());
 		}
-		if(p.getSubscriptionDate() != null) {
-			this.subscriptionDate  = Constants.timeFormat().format(p.getSubscriptionDate());
-		}
+		//if(p.getSubscriptionDate() != null) {
+		//	this.subscriptionDate  = Constants.timeFormat().format(p.getSubscriptionDate());
+		//}
 		if(p.getCertificationDate() != null) {
 			this.certificationDate  = Constants.timeFormat().format(p.getCertificationDate());
 		}
@@ -79,12 +79,12 @@ public class PersonObj {
 	public void setRegistrationDate(String registrationDate) {
 		this.registrationDate = registrationDate;
 	}
-	public String getSubscriptionDate() {
-		return subscriptionDate;
-	}
-	public void setSubscriptionDate(String subscriptionDate) {
-		this.subscriptionDate = subscriptionDate;
-	}
+	//public String getSubscriptionDate() {
+	//	return subscriptionDate;
+	//}
+	//public void setSubscriptionDate(String subscriptionDate) {
+	//	this.subscriptionDate = subscriptionDate;
+	//}
 	public String getCertificationDate() {
 		return certificationDate;
 	}
