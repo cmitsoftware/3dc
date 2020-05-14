@@ -136,7 +136,7 @@
                                             <label>Anno Inizio abbonamento ${fn:toUpperCase(subscription.typeName)}</label>
                                             <select id="${subscription.typeName}.referenceYear" name="${subscription.typeName}.referenceYear" class="form-control">
                                                 <option value="">NON ABBONATO</option>
-                                                <c:forEach var="counter" begin="2020" end="2040">
+                                                <c:forEach var="counter" begin="2015" end="2040">
                                                     <option value="${counter}" <c:out value="${counter == subscription.referenceYear ? 'selected': ''}"/>><c:out value="${counter}"/></option>
                                                 </c:forEach>
                                             </select>
