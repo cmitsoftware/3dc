@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.climbing.domain.Person;
 import org.climbing.domain.Subscription;
 import org.climbing.domain.SubscriptionType;
+import org.climbing.util.Utils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
@@ -56,6 +57,8 @@ public class PersonDAO extends BaseHibernateDAO{
     public Person save(Person transientInstance) {
 		log.debug("saving Person instance");
 		try {
+			transientInstance.setName(Utils.setUppercaseFirstLetter(transientInstance.getName()));
+			transientInstance.setSurname(Utils.setUppercaseFirstLetter(transientInstance.getSurname()));
 			getSession().saveOrUpdate(transientInstance);
 			log.debug("save successful");
 		} catch (RuntimeException re) {

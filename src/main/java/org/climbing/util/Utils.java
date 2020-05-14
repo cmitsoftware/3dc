@@ -17,5 +17,12 @@ public class Utils {
 		fis.close();
 		return out;
 	}
-	
+
+	public static String setUppercaseFirstLetter(String value){
+
+		if (value!=null ? value.length() > 0 : false) {
+			value = value.substring(0, 1).toUpperCase() + value.substring(1);
+		}
+		return value;
+	}
 }
