@@ -9,7 +9,7 @@ public class Subscription implements java.io.Serializable {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType. IDENTITY)
     private Integer id;
 
     @ManyToOne(cascade=CascadeType.ALL, optional=true, fetch = FetchType.EAGER)

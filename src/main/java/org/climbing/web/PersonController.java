@@ -200,9 +200,7 @@ public class PersonController {
 				}
 			}
 
-			person = personDao.preparePersonSubscriptionsForSave(person, formSubscriptions);
-
-			person = personDao.save(person);
+			person = personDao.save(person, formSubscriptions);
 			model.addAttribute("person", person);
 
 		} catch (ParseException e) {

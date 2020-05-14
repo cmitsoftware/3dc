@@ -56,86 +56,49 @@ public class PersonDAO extends BaseHibernateDAO{
     public Person save(Person transientInstance) {
 		log.debug("saving Person instance");
 		try {
+			getSession().saveOrUpdate(transientInstance);
+			log.debug("save successful");
+		} catch (RuntimeException re) {
+			log.error("save failed", re);
+			throw re;
+		}
+		return transientInstance;
+	}
 
-			// delete persisted subscriptions not anymore needed (link to person removed)
-			Set<Subscription> subscriptions = new HashSet<>();
-			for (Subscription subscription: (transientInstance.getSubscriptions() != null ? transientInstance.getSubscriptions() : new ArrayList<Subscription>())) {
-				if (subscription.getId() != null && subscription.getPerson() == null) {
-					getSession().delete(subscription);
+	public Person save(Person person, Set<Subscription> formSubscriptions) {
+		log.debug("saving Person instance with form subscriptions");
+		try {
+
+			Set<Subscription> finalSubscriptions = new HashSet<>();
+			formSubscriptions = formSubscriptions != null ? formSubscriptions : new HashSet<>();
+			for (Subscription sessionSubscription: (person.getSubscriptions() != null ? person.getSubscriptions() : new ArrayList<Subscription>())) {
+				Optional<Subscription> optionalSubscription = formSubscriptions.stream().filter(
+						subscriptionEl -> subscriptionEl.getTypeName().equals(sessionSubscription.getTypeName())).findAny();
+				if (optionalSubscription.isPresent()) {
+					//update subscription
+					Subscription formSubscription = optionalSubscription.get();
+					sessionSubscription.setStartDate(formSubscription.getStartDate());
+					sessionSubscription.setReferenceYear(formSubscription.getReferenceYear());
+					sessionSubscription.setEndDate(formSubscription.getEndDate());
+					formSubscriptions.remove(formSubscription);
+					finalSubscriptions.add(sessionSubscription);
 				} else {
-					subscriptions.add(subscription);
+					//delete subscription
+					getSession().delete(sessionSubscription);
 				}
 			}
-			transientInstance.setSubscriptions(subscriptions);
 
-			getSession().saveOrUpdate(transientInstance);
+			//add new subscriptions
+			formSubscriptions.forEach(subscription -> subscription.setPerson(person));
+			finalSubscriptions.addAll(formSubscriptions);
+			person.setSubscriptions(finalSubscriptions);
+
+			getSession().saveOrUpdate(person);
 			log.debug("save successful");
 		} catch (RuntimeException re) {
 			log.error("save failed", re);
 			throw re;
 		}
-		return transientInstance;
-	}
-
-	public Person save2(Person transientInstance, Set<Subscription> newSubscriptions) {
-		log.debug("saving Person instance");
-		try {
-
-			for (Subscription subscription: transientInstance.getSubscriptions()) {
-					getSession().delete(subscription);
-			}
-			transientInstance.setSubscriptions(newSubscriptions);
-
-			getSession().saveOrUpdate(transientInstance);
-			log.debug("save successful");
-		} catch (RuntimeException re) {
-			log.error("save failed", re);
-			throw re;
-		}
-		return transientInstance;
-	}
-
-	public void deleteSubscriptions(Set<Subscription> subscriptions) {
-		log.debug("deleting subscriptions");
-		try {
-
-			for (Subscription subscription: subscriptions) {
-				getSession().delete(subscription);
-			}
-
-			log.debug("delete successful");
-		} catch (RuntimeException re) {
-			log.error("save failed", re);
-			throw re;
-		}
-	}
-
-	public Person preparePersonSubscriptionsForSave(Person person, Set<Subscription> formSubscriptions) {
-
-		for (Subscription sessionSubscription: (person.getSubscriptions() != null ? person.getSubscriptions() : new ArrayList<Subscription>())) {
-			Optional<Subscription> optionalSubscription = formSubscriptions.stream().filter(
-					subscriptionEl -> subscriptionEl.getTypeName().equals(sessionSubscription.getTypeName())).findAny();
-			if (optionalSubscription.isPresent()) {
-				//update subscription
-				Subscription formSubscription = optionalSubscription.get();
-				sessionSubscription.setStartDate(formSubscription.getStartDate());
-				sessionSubscription.setReferenceYear(formSubscription.getReferenceYear());
-				sessionSubscription.setEndDate(formSubscription.getEndDate());
-				formSubscriptions.remove(formSubscription);
-			} else {
-				//delete subscription, removing the person link will force Dao delete it
-				sessionSubscription.setPerson(null);
-			}
-		}
-
-		//add new subscriptions
-		formSubscriptions.forEach(subscription -> subscription.setPerson(person));
-		if (person.getSubscriptions()!=null) {
-			person.getSubscriptions().addAll(formSubscriptions);
-		} else{
-			person.setSubscriptions(formSubscriptions);
-		}
-
 		return person;
 	}
     

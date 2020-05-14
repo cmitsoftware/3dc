@@ -34,6 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,7 +64,8 @@ public class ImportController {
 	@Value("${tmp.user.path}") private String tmpUserPath;
 	
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-	
+
+	@Transactional
 	@RequestMapping(params = "method=importPersons", method = RequestMethod.POST)
 	public String importPersons(@RequestParam(value="file") MultipartFile[] file,
 			HttpServletRequest request, HttpServletResponse response,
@@ -580,18 +582,11 @@ public class ImportController {
 							creationDate = new Date();
 						} 
 						person.setCreationDate(creationDate);
-						person.setSubscriptions(subscriptions);
-						personDao.save(person);
+						personDao.save(person, subscriptions);
 						inserted++;
 					} else {
 						log.info("Updating person with number {}", number);
-						//update, add, delete subscriptions
-						//personDao.deleteSubscriptions(person.getSubscriptions());
-						//person.setSubscriptions(subscriptions);
-						//person = personDao.preparePersonSubscriptionsForSave(person, subscriptions);
-						//personDao.save2(person, subscriptions);
-						person.setSubscriptions(null);
-						personDao.save(person);
+						personDao.save(person, subscriptions);
 						updated++;
 					}
 					
