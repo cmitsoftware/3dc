@@ -16,8 +16,7 @@
         <version.standard.taglibs>1.1.2</version.standard.taglibs>
         <version.commons.logging>1.1.1</version.commons.logging>
         <version.hibernate>5.1.3.Final</version.hibernate>
-		<!--<version.mysql>5.1.6</version.mysql>-->
-		<version.mysql>8.0.11</version.mysql>
+		<version.mysql>5.1.6</version.mysql>
     </properties>
     
     <profiles>
