@@ -42,10 +42,10 @@ public class SubscriptionUtil {
         try {
             for (; i < (savedSubscriptionTypesNumber.equals(-1) ? MAX_NUMBER_OF_SUBSCRIPTION_TYPES : savedSubscriptionTypesNumber); i++ ) {
                 Configurations subscriptionTypeConfiguration = configurationsDAO.findByKey(SUBSCRIPTION_TYPE_CONFIGURATION_KEY_PREFIX + i);
-                try {
+                if (subscriptionTypeConfiguration!=null) {
                     subscriptionTypes.add(buildSubscriptionTypeFromConfiguration(subscriptionTypeConfiguration));
-                } catch (Exception e1) {
-                    log.error("Configuration " + SUBSCRIPTION_TYPE_CONFIGURATION_KEY_PREFIX + i + " is not well formed. " + e1.getMessage());
+                } else {
+                    savedSubscriptionTypesNumber = i;
                 }
             }
         } catch (Exception e) {
