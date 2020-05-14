@@ -64,43 +64,6 @@ public class PersonDAO extends BaseHibernateDAO{
 		}
 		return transientInstance;
 	}
-
-	public Person save(Person person, Set<Subscription> formSubscriptions) {
-		log.debug("saving Person instance with form subscriptions");
-		try {
-
-			Set<Subscription> finalSubscriptions = new HashSet<>();
-			formSubscriptions = formSubscriptions != null ? formSubscriptions : new HashSet<>();
-			for (Subscription sessionSubscription: (person.getSubscriptions() != null ? person.getSubscriptions() : new ArrayList<Subscription>())) {
-				Optional<Subscription> optionalSubscription = formSubscriptions.stream().filter(
-						subscriptionEl -> subscriptionEl.getTypeName().equals(sessionSubscription.getTypeName())).findAny();
-				if (optionalSubscription.isPresent()) {
-					//update subscription
-					Subscription formSubscription = optionalSubscription.get();
-					sessionSubscription.setStartDate(formSubscription.getStartDate());
-					sessionSubscription.setReferenceYear(formSubscription.getReferenceYear());
-					sessionSubscription.setEndDate(formSubscription.getEndDate());
-					formSubscriptions.remove(formSubscription);
-					finalSubscriptions.add(sessionSubscription);
-				} else {
-					//delete subscription
-					getSession().delete(sessionSubscription);
-				}
-			}
-
-			//add new subscriptions
-			formSubscriptions.forEach(subscription -> subscription.setPerson(person));
-			finalSubscriptions.addAll(formSubscriptions);
-			person.setSubscriptions(finalSubscriptions);
-
-			getSession().saveOrUpdate(person);
-			log.debug("save successful");
-		} catch (RuntimeException re) {
-			log.error("save failed", re);
-			throw re;
-		}
-		return person;
-	}
     
     public List<Person> findAll(String order, String direction){
     	

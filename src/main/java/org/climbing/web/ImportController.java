@@ -535,34 +535,12 @@ public class ImportController {
 					}
 					
 					Person person = new Person();
-					if(number != null) {
-						DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
-						dc.add(Restrictions.eq("number", number));
-						List<Person> persons = personDao.findByCriteria(dc);
-						if(CollectionUtils.isEmpty(persons)) {
-							createNewPerson = true;
-						} else {
-							person = persons.get(0);
-							person = personDao.findById(person.getId()); //to obtain a person object in session for next updates (e.g. delete subscriptions)
-							//TODO
-							// errore se piu di un utente con stesso number
-						}
-					} else {
-						number = personDao.getNextNumber() + 1;
-					}
-					
-					if(createNewPerson && 
-							(StringUtils.isEmpty(name) || StringUtils.isEmpty(surname))) {
-						throw new Exception("Riga " + row.getRowNum() + ": impossibile creare climber senza nome e cognome");
-					}
-					
 					person.setNumber(number);
 					person.setSurname(surname);
 					person.setName(name);
 					person.setPhone(phone);
 					person.setRegistrationDate(registrationDate);
 					person.setCertificationDate(certificationDate);
-					//person.setSubscriptionDate(subscriptionDate);
 					person.setFreeEntryDate(freeEntryDate);
 					person.setCf(cf);
 					person.setEmail(email);
@@ -574,20 +552,16 @@ public class ImportController {
 					person.setApprovalDate(approvalDate);
 					person.setCustomSubscriptionStartDate(customSubscriptionStartDate);
 					person.setCustomSubscriptionEndDate(customSubscriptionEndDate);
-					
-					if(createNewPerson) {
-						log.info("Creating new person with number {}", number);
-						person.setUser(((ClimbingUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser());
-						if(creationDate == null) {
-							creationDate = new Date();
-						} 
-						person.setCreationDate(creationDate);
-						personDao.save(person, subscriptions);
-						inserted++;
-					} else {
-						log.info("Updating person with number {}", number);
-						personDao.save(person, subscriptions);
+					person.setSubscriptions(subscriptions);
+
+					//Need to save person in Transactional method or the child entities remain detached.
+					PersonSaveResult personSaveResult = savePerson(person, row.getRowNum());
+
+					if (PersonSaveResult.UPDATE_CLIMBER.equals(personSaveResult)) {
 						updated++;
+					}
+					if (PersonSaveResult.NEW_CLIMBER.equals(personSaveResult)){
+						inserted++;
 					}
 					
 				} catch (Exception e) {
@@ -614,5 +588,70 @@ public class ImportController {
 		redirectAttributes.addFlashAttribute("updated", updated);
 		
 		return "redirect:report";
+	}
+
+	private enum PersonSaveResult {
+		NEW_CLIMBER, UPDATE_CLIMBER;
+	}
+
+	@Transactional
+	private PersonSaveResult savePerson(Person person, Integer rowNum) throws Exception {
+
+		Person transientPerson = new Person();
+		PersonSaveResult personSaveResult = PersonSaveResult.UPDATE_CLIMBER;
+
+		Integer number = person.getNumber();
+		if(number != null) {
+			DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
+			dc.add(Restrictions.eq("number", number));
+			List<Person> persons = personDao.findByCriteria(dc);
+			if(CollectionUtils.isEmpty(persons)) {
+				personSaveResult = PersonSaveResult.NEW_CLIMBER;
+			} else {
+				if (persons.size() > 1) {
+					throw new Exception("Riga " + rowNum + ": trovate piu persone con lo stesso numero " + number );
+				} else {
+					transientPerson = persons.get(0);
+				}
+			}
+		} else {
+			number = personDao.getNextNumber() + 1;
+			personSaveResult = PersonSaveResult.NEW_CLIMBER;
+		}
+
+		if(PersonSaveResult.NEW_CLIMBER.equals(personSaveResult) &&
+				(StringUtils.isEmpty(person.getName()) || StringUtils.isEmpty(person.getSurname()))) {
+			throw new Exception("Riga " + rowNum + ": impossibile creare climber senza nome e cognome");
+		}
+
+		transientPerson.setNumber(number);
+		transientPerson.setSurname(person.getSurname());
+		transientPerson.setName(person.getName());
+		transientPerson.setPhone(person.getPhone());
+		transientPerson.setRegistrationDate(person.getRegistrationDate());
+		transientPerson.setCertificationDate(person.getCertificationDate());
+		transientPerson.setFreeEntryDate(person.getFreeEntryDate());
+		transientPerson.setCf(person.getCf());
+		transientPerson.setEmail(person.getEmail());
+		transientPerson.setCity(person.getCity());
+		transientPerson.setAddress(person.getAddress());
+		transientPerson.setBirthDate(person.getBirthDate());
+		transientPerson.setAffiliationDate(person.getAffiliationDate());
+		transientPerson.setFirstRegistrationDate(person.getFirstRegistrationDate());
+		transientPerson.setApprovalDate(person.getApprovalDate());
+		transientPerson.setCustomSubscriptionStartDate(person.getCustomSubscriptionStartDate());
+		transientPerson.setCustomSubscriptionEndDate(person.getCustomSubscriptionEndDate());
+
+		if(PersonSaveResult.NEW_CLIMBER.equals(personSaveResult)) {
+			log.info("Creating new person with number {}", number);
+			transientPerson.setUser(((ClimbingUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser());
+			transientPerson.setCreationDate(person.getCreationDate() != null ? person.getCreationDate() : new Date());
+		} else {
+			log.info("Updating person with number {}", number);
+		}
+		transientPerson = subscriptionUtil.preparePersonWithFormSubscriptions(transientPerson, person.getSubscriptions());
+		personDao.save(transientPerson);
+
+		return personSaveResult;
 	}
 }

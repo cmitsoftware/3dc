@@ -1,6 +1,7 @@
 package org.climbing.util;
 
 import org.climbing.domain.Configurations;
+import org.climbing.domain.Person;
 import org.climbing.domain.Subscription;
 import org.climbing.domain.SubscriptionType;
 import org.climbing.repo.BaseHibernateDAO;
@@ -166,6 +167,46 @@ public class SubscriptionUtil {
         } else {
             return ((12-startMonth) + endMonth) + 1;
         }
+    }
+
+    /**
+     * Prepare the entity for the save, considering orphan-removal and CascadeType on Person entity
+     */
+    public Person preparePersonWithFormSubscriptions(Person person, Set<Subscription> formSubscriptions) {
+
+        Set<Subscription> deleteSubscriptions = new HashSet<Subscription>();
+        formSubscriptions = formSubscriptions != null ? formSubscriptions : new HashSet<>();
+
+        for (Subscription sessionSubscription : (person.getSubscriptions() != null ? person.getSubscriptions(): new ArrayList<Subscription>())) {
+            Optional<Subscription> optionalSubscription = formSubscriptions.stream().filter(
+                    subscriptionEl -> subscriptionEl.getTypeName().equals(sessionSubscription.getTypeName())).findAny();
+            if (optionalSubscription.isPresent()) {
+                //update subscription
+                Subscription formSubscription = optionalSubscription.get();
+                sessionSubscription.setStartDate(formSubscription.getStartDate());
+                sessionSubscription.setReferenceYear(formSubscription.getReferenceYear());
+                sessionSubscription.setEndDate(formSubscription.getEndDate());
+                formSubscriptions.remove(formSubscription);
+            } else {
+                deleteSubscriptions.add(sessionSubscription);
+            }
+        }
+
+        // remove delete subscription from person subscriptions set
+        for (Subscription subscription : deleteSubscriptions ) {
+            person.getSubscriptions().remove(subscription);
+        }
+
+        // add new subscriptions
+        for (Subscription formSubscription : formSubscriptions) {
+            formSubscription.setPerson(person);
+            if (person.getSubscriptions() == null){
+                person.setSubscriptions(new HashSet<>());
+            }
+            person.getSubscriptions().add(formSubscription);
+        }
+
+        return person;
     }
 }
 

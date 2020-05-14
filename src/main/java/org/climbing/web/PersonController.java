@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.climbing.domain.Person;
 import org.climbing.domain.Subscription;
 import org.climbing.domain.SubscriptionType;
-import org.climbing.repo.ConfigurationsDAO;
 import org.climbing.repo.PersonDAO;
 import org.climbing.security.ClimbingUserDetails;
 import org.climbing.util.SubscriptionUtil;
@@ -200,9 +199,10 @@ public class PersonController {
 				}
 			}
 
-			person = personDao.save(person, formSubscriptions);
-			model.addAttribute("person", person);
+			person = subscriptionUtil.preparePersonWithFormSubscriptions(person, formSubscriptions);
+			person = personDao.save(person);
 
+			model.addAttribute("person", person);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
