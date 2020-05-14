@@ -73,7 +73,7 @@ public class PersonController {
 	 */
 	private Set<Subscription> prepareSubscriptions(Set<Subscription> subscriptions) {
 
-		Set<Subscription> preparedSubscriptions = new HashSet<>();
+		LinkedHashSet<Subscription> preparedSubscriptions = new LinkedHashSet<>(); // use linked hash set to have the same order in web page
 		subscriptions = subscriptions != null ? subscriptions : new HashSet<>();
 		for (SubscriptionType subscriptionType : subscriptionUtil.getSubscriptionTypes()) {
 			Subscription subscription = new Subscription();
