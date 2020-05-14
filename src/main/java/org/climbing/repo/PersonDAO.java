@@ -1,13 +1,11 @@
 package org.climbing.repo;
 
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.climbing.domain.Person;
 import org.climbing.domain.Subscription;
+import org.climbing.domain.SubscriptionType;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
@@ -61,7 +59,7 @@ public class PersonDAO extends BaseHibernateDAO{
 
 			// delete persisted subscriptions not anymore needed (link to person removed)
 			Set<Subscription> subscriptions = new HashSet<>();
-			for (Subscription subscription: transientInstance.getSubscriptions()) {
+			for (Subscription subscription: (transientInstance.getSubscriptions() != null ? transientInstance.getSubscriptions() : new ArrayList<Subscription>())) {
 				if (subscription.getId() != null && subscription.getPerson() == null) {
 					getSession().delete(subscription);
 				} else {
@@ -77,6 +75,68 @@ public class PersonDAO extends BaseHibernateDAO{
 			throw re;
 		}
 		return transientInstance;
+	}
+
+	public Person save2(Person transientInstance, Set<Subscription> newSubscriptions) {
+		log.debug("saving Person instance");
+		try {
+
+			for (Subscription subscription: transientInstance.getSubscriptions()) {
+					getSession().delete(subscription);
+			}
+			transientInstance.setSubscriptions(newSubscriptions);
+
+			getSession().saveOrUpdate(transientInstance);
+			log.debug("save successful");
+		} catch (RuntimeException re) {
+			log.error("save failed", re);
+			throw re;
+		}
+		return transientInstance;
+	}
+
+	public void deleteSubscriptions(Set<Subscription> subscriptions) {
+		log.debug("deleting subscriptions");
+		try {
+
+			for (Subscription subscription: subscriptions) {
+				getSession().delete(subscription);
+			}
+
+			log.debug("delete successful");
+		} catch (RuntimeException re) {
+			log.error("save failed", re);
+			throw re;
+		}
+	}
+
+	public Person preparePersonSubscriptionsForSave(Person person, Set<Subscription> formSubscriptions) {
+
+		for (Subscription sessionSubscription: (person.getSubscriptions() != null ? person.getSubscriptions() : new ArrayList<Subscription>())) {
+			Optional<Subscription> optionalSubscription = formSubscriptions.stream().filter(
+					subscriptionEl -> subscriptionEl.getTypeName().equals(sessionSubscription.getTypeName())).findAny();
+			if (optionalSubscription.isPresent()) {
+				//update subscription
+				Subscription formSubscription = optionalSubscription.get();
+				sessionSubscription.setStartDate(formSubscription.getStartDate());
+				sessionSubscription.setReferenceYear(formSubscription.getReferenceYear());
+				sessionSubscription.setEndDate(formSubscription.getEndDate());
+				formSubscriptions.remove(formSubscription);
+			} else {
+				//delete subscription, removing the person link will force Dao delete it
+				sessionSubscription.setPerson(null);
+			}
+		}
+
+		//add new subscriptions
+		formSubscriptions.forEach(subscription -> subscription.setPerson(person));
+		if (person.getSubscriptions()!=null) {
+			person.getSubscriptions().addAll(formSubscriptions);
+		} else{
+			person.setSubscriptions(formSubscriptions);
+		}
+
+		return person;
 	}
     
     public List<Person> findAll(String order, String direction){

@@ -78,24 +78,24 @@ public class ReportUtil {
 		int colOffset = 0;
 		Row titlesRow = sheetsData.createRow((short)rowOffset);
 
-		titlesRow = addCell(titlesRow,"N.", colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Cognome",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Nome",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Telefono",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data iscrizione 3dc annuale",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data certificato medico",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data prova gratuita",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Codice fiscale",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Email",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Paese",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Indirizzo",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data nascita",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data affiliazione FASI",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data richiesta prima iscrizione",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data approvazione 3dc",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data prima registrazione",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data inizio abbonamento Custom",++colOffset, titlesStyle);
-		titlesRow = addCell(titlesRow,"Data fine abbonamento Custom",++colOffset, titlesStyle);
+		/*0 */ titlesRow = addCell(titlesRow,"N.", colOffset, titlesStyle);
+		/*1 */ titlesRow = addCell(titlesRow,"Cognome",++colOffset, titlesStyle);
+		/*2 */ titlesRow = addCell(titlesRow,"Nome",++colOffset, titlesStyle);
+		/*3 */ titlesRow = addCell(titlesRow,"Telefono",++colOffset, titlesStyle);
+		/*4 */ titlesRow = addCell(titlesRow,"Data iscrizione 3dc annuale",++colOffset, titlesStyle);
+		/*5 */ titlesRow = addCell(titlesRow,"Data certificato medico",++colOffset, titlesStyle);
+		/*6 */ titlesRow = addCell(titlesRow,"Data prova gratuita",++colOffset, titlesStyle);
+		/*7 */ titlesRow = addCell(titlesRow,"Codice fiscale",++colOffset, titlesStyle);
+		/*8 */ titlesRow = addCell(titlesRow,"Email",++colOffset, titlesStyle);
+		/*9 */ titlesRow = addCell(titlesRow,"Paese",++colOffset, titlesStyle);
+		/*10*/ titlesRow = addCell(titlesRow,"Indirizzo",++colOffset, titlesStyle);
+		/*11*/ titlesRow = addCell(titlesRow,"Data nascita",++colOffset, titlesStyle);
+		/*12*/ titlesRow = addCell(titlesRow,"Data affiliazione FASI",++colOffset, titlesStyle);
+		/*13*/ titlesRow = addCell(titlesRow,"Data richiesta prima iscrizione",++colOffset, titlesStyle);
+		/*14*/ titlesRow = addCell(titlesRow,"Data approvazione 3dc",++colOffset, titlesStyle);
+		/*15*/ titlesRow = addCell(titlesRow,"Data prima registrazione",++colOffset, titlesStyle);
+		/*16*/ titlesRow = addCell(titlesRow,"Data inizio abbonamento Custom",++colOffset, titlesStyle);
+		/*17*/ titlesRow = addCell(titlesRow,"Data fine abbonamento Custom",++colOffset, titlesStyle);
 
 		List<SubscriptionType> subscriptionTypes = subscriptionUtil.getSubscriptionTypes();
 		for (SubscriptionType subscriptionType: subscriptionTypes) {

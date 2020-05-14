@@ -196,33 +196,11 @@ public class PersonController {
 				if(parameter != null ? !"".equals(parameter) : false) {
 					Integer referenceYear = Integer.parseInt(parameter);
 					Subscription subscription = subscriptionUtil.buildSubscriptionFromType(subscriptionType, referenceYear);
-					subscription.setPerson(person);
 					formSubscriptions.add(subscription);
 				}
 			}
 
-			for (Subscription sessionSubscription: (person.getSubscriptions() != null ? person.getSubscriptions() : new ArrayList<Subscription>())) {
-				Optional<Subscription> optionalSubscription = formSubscriptions.stream().filter(
-						subscriptionEl -> subscriptionEl.getTypeName().equals(sessionSubscription.getTypeName())).findAny();
-				if (optionalSubscription.isPresent()) {
-					//update subscription
-					Subscription formSubscription = optionalSubscription.get();
-					sessionSubscription.setStartDate(formSubscription.getStartDate());
-					sessionSubscription.setReferenceYear(formSubscription.getReferenceYear());
-					sessionSubscription.setEndDate(formSubscription.getEndDate());
-					formSubscriptions.remove(formSubscription);
-				} else {
-					//delete subscription, removing the person link will force Dao delete it
-					sessionSubscription.setPerson(null);
-				}
-			}
-
-			//add new subscriptions
-			if (person.getSubscriptions()!=null) {
-				person.getSubscriptions().addAll(formSubscriptions);
-			} else{
-				person.setSubscriptions(formSubscriptions);
-			}
+			person = personDao.preparePersonSubscriptionsForSave(person, formSubscriptions);
 
 			person = personDao.save(person);
 			model.addAttribute("person", person);

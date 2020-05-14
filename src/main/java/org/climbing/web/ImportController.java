@@ -2,13 +2,7 @@ package org.climbing.web;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,10 +15,13 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.climbing.domain.Person;
+import org.climbing.domain.Subscription;
+import org.climbing.domain.SubscriptionType;
 import org.climbing.repo.PersonDAO;
 import org.climbing.repo.UserDAO;
 import org.climbing.security.ClimbingUserDetails;
 import org.climbing.util.ReportUtil;
+import org.climbing.util.SubscriptionUtil;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -59,6 +56,9 @@ public class ImportController {
 	
 	@Autowired
 	ReportUtil reportUtil;
+
+	@Autowired
+	SubscriptionUtil subscriptionUtil;
 	
 	@Value("${tmp.user.path}") private String tmpUserPath;
 	
@@ -95,7 +95,8 @@ public class ImportController {
 			if (rowIterator.hasNext()) {
 				rowIterator.next();
 			}
-			
+
+			List<SubscriptionType> subscriptionTypes = subscriptionUtil.getSubscriptionTypes();
 
 			while (rowIterator.hasNext()) {
 				
@@ -127,6 +128,9 @@ public class ImportController {
 					Date firstRegistrationDate = null;
 					Date approvalDate = null;
 					Date creationDate = null;
+					Date customSubscriptionStartDate = null;
+					Date customSubscriptionEndDate = null;
+					Set<Subscription> subscriptions = new HashSet<Subscription>();
 					
 					while (cellIterator.hasNext()) {
 
@@ -235,34 +239,6 @@ public class ImportController {
 								break;
 							case 6:
 								try {
-									subscriptionDate = cell.getDateCellValue();
-								} catch (Exception e) {
-									log.warn("Cannot read subscription date as date cell");
-								}
-								if(subscriptionDate == null ) {
-									String subscriptionDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(subscriptionDateS)) {
-										try {
-											subscriptionDate = sdf1.parse(subscriptionDateS);
-										} catch (Exception e) {}
-										if(subscriptionDate == null) {
-											try {
-												subscriptionDate = sdf2.parse(subscriptionDateS);
-											} catch (Exception e) {}
-										}
-										if(subscriptionDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data abbonamento\n";
-											errors.put(row.getRowNum(), error);
-										}
-									} 
-								}
-								break;
-							case 7:
-								try {
 									freeEntryDate = cell.getDateCellValue();
 								} catch (Exception e) {
 									log.warn("Cannot read free entry date as date cell");
@@ -289,19 +265,19 @@ public class ImportController {
 									} 
 								}
 								break;
-							case 8:
+							case 7:
 								cf = cell.getStringCellValue().trim();
 								break;
-							case 9:
+							case 8:
 								email = cell.getStringCellValue().trim();
 								break;
-							case 10:
+							case 9:
 								city = cell.getStringCellValue().trim();
 								break;
-							case 11:
+							case 10:
 								address = cell.getStringCellValue().trim();
 								break;
-							case 12:
+							case 11:
 								try {
 									birthDate = cell.getDateCellValue();
 								} catch (Exception e) {
@@ -329,7 +305,7 @@ public class ImportController {
 									} 
 								}
 								break;
-							case 13:
+							case 12:
 								try {
 									affiliationDate = cell.getDateCellValue();
 								} catch (Exception e) {
@@ -357,7 +333,7 @@ public class ImportController {
 									} 
 								}
 								break;
-							case 14:
+							case 13:
 								try {
 									firstRegistrationDate = cell.getDateCellValue();
 								} catch (Exception e) {
@@ -385,7 +361,7 @@ public class ImportController {
 									}
 								}
 								break;
-							case 15:
+							case 14:
 								try {
 									approvalDate = cell.getDateCellValue();
 								} catch (Exception e) {
@@ -413,7 +389,7 @@ public class ImportController {
 									} 
 								}
 								break;
-							case 16:
+							case 15:
 //								try {
 //									creationDate = cell.getDateCellValue();
 //								} catch (Exception e) {
@@ -441,6 +417,114 @@ public class ImportController {
 //									} 
 //								}
 								break;
+							case 16:
+								try {
+									customSubscriptionStartDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read custom subscription start date as date cell");
+								}
+								if(customSubscriptionStartDate == null) {
+									String customSubscriptionStartDateS = cell.getStringCellValue().trim();
+									if(!StringUtils.isEmpty(customSubscriptionStartDateS)) {
+										try {
+											customSubscriptionStartDate = sdf1.parse(customSubscriptionStartDateS);
+										} catch (Exception e) {}
+										if(customSubscriptionStartDate == null) {
+											try {
+												customSubscriptionStartDate = sdf2.parse(customSubscriptionStartDateS);
+											} catch (Exception e) {}
+										}
+										if(customSubscriptionStartDate == null) {
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Data inizio abbonamento Custom\n";
+											errors.put(row.getRowNum(), error);
+										}
+									}
+								}
+								break;
+							case 17:
+								try {
+									customSubscriptionEndDate = cell.getDateCellValue();
+								} catch (Exception e) {
+									log.warn("Cannot read custom subscription end date as date cell");
+								}
+								if(customSubscriptionEndDate == null) {
+									String customSubscriptionEndDateS = cell.getStringCellValue().trim();
+									if(!StringUtils.isEmpty(customSubscriptionEndDateS)) {
+										try {
+											customSubscriptionEndDate = sdf1.parse(customSubscriptionEndDateS);
+										} catch (Exception e) {}
+										if(customSubscriptionEndDate == null) {
+											try {
+												customSubscriptionEndDate = sdf2.parse(customSubscriptionEndDateS);
+											} catch (Exception e) {}
+										}
+										if(customSubscriptionEndDate == null) {
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Data fine abbonamento Custom\n";
+											errors.put(row.getRowNum(), error);
+										}
+									}
+								}
+								break;
+							}
+
+
+							// put subscription
+
+							if (cell.getColumnIndex() >= 18 && !subscriptionTypes.isEmpty()) {
+
+								int typesIndex = cell.getColumnIndex()-18;
+								if (!(typesIndex >= 0  && typesIndex < subscriptionTypes.size())) {
+									String error = "";
+									if(errors.containsKey(row.getRowNum())) {
+										error = errors.get(row.getRowNum());
+									}
+									error += "Il numero di tipi di abbonamenti a sistema non coincide con gli abbonamenti letti.\n";
+									errors.put(row.getRowNum(), error);
+								} else {
+									SubscriptionType subscriptionType = subscriptionTypes.get(typesIndex);
+
+									Integer subscriptionReferenceYear = null;
+									if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+										try {
+											subscriptionReferenceYear = (int)cell.getNumericCellValue();
+										} catch(Exception e) {
+											e.printStackTrace();
+											String error = "";
+											if(errors.containsKey(row.getRowNum())) {
+												error = errors.get(row.getRowNum());
+											}
+											error += "Errore nel leggere il campo: Anno di inizio abbonamento " + subscriptionType.getName() + "\n";
+											errors.put(row.getRowNum(), error);
+										}
+									} else {
+										String subscriptionReferenceYearS = cell.getStringCellValue().trim();
+										if (!subscriptionReferenceYearS.isEmpty()) {
+											try {
+												subscriptionReferenceYear = Integer.parseInt(subscriptionReferenceYearS);
+											} catch (Exception e) {
+												e.printStackTrace();
+												String error = "";
+												if(errors.containsKey(row.getRowNum())) {
+													error = errors.get(row.getRowNum());
+												}
+												error += "Errore nel leggere il campo: Anno di inizio abbonamento " + subscriptionType.getName() + "\n";
+												errors.put(row.getRowNum(), error);
+											}
+										}
+									}
+									if(subscriptionReferenceYear!=null) {
+										Subscription subscription = subscriptionUtil.buildSubscriptionFromType(subscriptionType, subscriptionReferenceYear);
+										subscriptions.add(subscription);
+									}
+								}
 							}
 							
 						} catch (Exception e) {
@@ -457,6 +541,7 @@ public class ImportController {
 							createNewPerson = true;
 						} else {
 							person = persons.get(0);
+							person = personDao.findById(person.getId()); //to obtain a person object in session for next updates (e.g. delete subscriptions)
 							//TODO
 							// errore se piu di un utente con stesso number
 						}
@@ -485,6 +570,8 @@ public class ImportController {
 					person.setAffiliationDate(affiliationDate);
 					person.setFirstRegistrationDate(firstRegistrationDate);
 					person.setApprovalDate(approvalDate);
+					person.setCustomSubscriptionStartDate(customSubscriptionStartDate);
+					person.setCustomSubscriptionEndDate(customSubscriptionEndDate);
 					
 					if(createNewPerson) {
 						log.info("Creating new person with number {}", number);
@@ -493,10 +580,17 @@ public class ImportController {
 							creationDate = new Date();
 						} 
 						person.setCreationDate(creationDate);
+						person.setSubscriptions(subscriptions);
 						personDao.save(person);
 						inserted++;
 					} else {
 						log.info("Updating person with number {}", number);
+						//update, add, delete subscriptions
+						//personDao.deleteSubscriptions(person.getSubscriptions());
+						//person.setSubscriptions(subscriptions);
+						//person = personDao.preparePersonSubscriptionsForSave(person, subscriptions);
+						//personDao.save2(person, subscriptions);
+						person.setSubscriptions(null);
 						personDao.save(person);
 						updated++;
 					}

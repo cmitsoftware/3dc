@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -52,5 +53,13 @@ public class SubscriptionDAO extends BaseHibernateDAO{
 		DetachedCriteria dc = DetachedCriteria.forClass(Subscription.class);
 		dc.add(Restrictions.eq("person", personId));
 		return findByCriteria(dc);
+	}
+
+	public void deleteAllSubscriptionOfPerson(Integer personId) {
+
+    	List<Subscription> subscriptions = findAllSubscriptionOfPerson(personId);
+		for (Subscription subscription : (subscriptions!= null ? subscriptions : new ArrayList<Subscription>())) {
+			delete(subscription);
+		}
 	}
 }
