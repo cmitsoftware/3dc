@@ -1,7 +1,11 @@
 package org.climbing.web;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,15 +68,15 @@ public class ImportController {
 	@Value("${tmp.user.path}") private String tmpUserPath;
 	
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
+
+	public static final LocalDate MAX_ALLOWED_DATE = LocalDate.of(9999,12,31);
 
 	@Transactional
 	@RequestMapping(params = "method=importPersons", method = RequestMethod.POST)
 	public String importPersons(@RequestParam(value="file") MultipartFile[] file,
 			HttpServletRequest request, HttpServletResponse response,
 			final RedirectAttributes redirectAttributes) {
-		
-		SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
-		SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
 
 		int total = 0, inserted = 0, updated = 0;
 		Map<Integer, String> errors = new HashMap<Integer, String>();
@@ -184,87 +188,24 @@ public class ImportController {
 								phone = cell.getStringCellValue().trim();
 								break;
 							case 4:
-									try {
-										registrationDate = cell.getDateCellValue();
-									} catch (Exception e) {
-										log.warn("Cannot read registration date as date cell");
-									}
-									if(registrationDate == null ) {
-										String registrationDateS = cell.getStringCellValue().trim();
-										if(!StringUtils.isEmpty(registrationDateS)) {
-											try {
-												registrationDate = sdf1.parse(registrationDateS);
-											} catch (Exception e) {}
-											if(registrationDate == null) {
-												try {
-													registrationDate = sdf2.parse(registrationDateS);
-												} catch (Exception e) {}
-											}
-											if(registrationDate == null) {
-												String error = "";
-												if(errors.containsKey(row.getRowNum())) {
-													error = errors.get(row.getRowNum());
-												}
-												error += "Errore nel leggere il campo: Data di iscrizione 3dc annuale\n";
-												errors.put(row.getRowNum(), error);
-											}
-										} 
-									}
+								try {
+									registrationDate = parseDateValueCell(cell);
+								} catch (Exception e) {
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data di iscrizione 3dc annuale", errors, row);
+								}
 								break;
 							case 5:
 								try {
-									certificationDate = cell.getDateCellValue();
+									certificationDate = parseDateValueCell(cell);
 								} catch (Exception e) {
-									log.warn("Cannot read certification date as date cell");
-								}
-								if(certificationDate == null ) {
-									String certificationDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(certificationDateS)) {
-										try {
-											certificationDate = sdf1.parse(certificationDateS);
-										} catch (Exception e) {}
-										if(certificationDate == null) {
-											try {
-												certificationDate = sdf2.parse(certificationDateS);
-											} catch (Exception e) {}
-										}
-										if(certificationDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data certificato medico\n";
-											errors.put(row.getRowNum(), error);
-										}
-									} 
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data certificato medico", errors, row);
 								}
 								break;
 							case 6:
 								try {
-									freeEntryDate = cell.getDateCellValue();
+									freeEntryDate = parseDateValueCell(cell);
 								} catch (Exception e) {
-									log.warn("Cannot read free entry date as date cell");
-								}
-								if(freeEntryDate == null ) {
-									String freeEntryDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(freeEntryDateS)) {
-										try {
-											freeEntryDate = sdf1.parse(freeEntryDateS);
-										} catch (Exception e) {}
-										if(freeEntryDate == null) {
-											try {
-												freeEntryDate = sdf2.parse(freeEntryDateS);
-											} catch (Exception e) {}
-										}
-										if(freeEntryDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data entrata gratuita\n";
-											errors.put(row.getRowNum(), error);
-										}
-									} 
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data entrata gratuita", errors, row);
 								}
 								break;
 							case 7:
@@ -281,114 +222,30 @@ public class ImportController {
 								break;
 							case 11:
 								try {
-									birthDate = cell.getDateCellValue();
+									birthDate = parseDateValueCell(cell);
 								} catch (Exception e) {
-									log.warn("Cannot read birth date as date cell");
-								}
-								if(birthDate == null ) {
-									String birthDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(birthDateS)) {
-										try {
-											birthDate = sdf1.parse(birthDateS);
-										} catch (Exception e) {}
-										if(birthDate == null) {
-											try {
-												birthDate = sdf2.parse(birthDateS);
-											} catch (Exception e) {}
-										}
-										if(birthDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data di nascita\n";
-											errors.put(row.getRowNum(), error);
-										}
-									} 
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data di nascita", errors, row);
 								}
 								break;
 							case 12:
 								try {
-									affiliationDate = cell.getDateCellValue();
+									affiliationDate = parseDateValueCell(cell);
 								} catch (Exception e) {
-									log.warn("Cannot read affiliation date as date cell");
-								}
-								if(affiliationDate == null ) {
-									String affiliationDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(affiliationDateS)) {
-										try {
-											affiliationDate = sdf1.parse(affiliationDateS);
-										} catch (Exception e) {}
-										if(affiliationDate == null) {
-											try {
-												affiliationDate = sdf2.parse(affiliationDateS);
-											} catch (Exception e) {}
-										}
-										if(affiliationDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data di affiliazione\n";
-											errors.put(row.getRowNum(), error);
-										}
-									} 
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data di affiliazione", errors, row);
 								}
 								break;
 							case 13:
 								try {
-									firstRegistrationDate = cell.getDateCellValue();
+									firstRegistrationDate = parseDateValueCell(cell);
 								} catch (Exception e) {
-									log.warn("Cannot read first registration date as date cell");
-								}
-								if(firstRegistrationDate == null ) {
-									String firstRegistrationDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(firstRegistrationDateS)) {
-										try {
-											firstRegistrationDate = sdf1.parse(firstRegistrationDateS);
-										} catch (Exception e) {}
-										if(firstRegistrationDate == null) {
-											try {
-												firstRegistrationDate = sdf2.parse(firstRegistrationDateS);
-											} catch (Exception e) {}
-										}
-										if(firstRegistrationDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data prima registrazione 3d\n";
-											errors.put(row.getRowNum(), error);
-										} 
-									}
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data prima registrazione 3d", errors, row);
 								}
 								break;
 							case 14:
 								try {
-									approvalDate = cell.getDateCellValue();
+									approvalDate = parseDateValueCell(cell);
 								} catch (Exception e) {
-									log.warn("Cannot read approval date as date cell");
-								}
-								if(approvalDate == null ) {
-									String approvalDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(approvalDateS)) {
-										try {
-											approvalDate = sdf1.parse(approvalDateS);
-										} catch (Exception e) {}
-										if(approvalDate == null) {
-											try {
-												approvalDate = sdf2.parse(approvalDateS);
-											} catch (Exception e) {}
-										}
-										if(approvalDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data di approvazione\n";
-											errors.put(row.getRowNum(), error);
-										}
-									} 
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data di approvazione", errors, row);
 								}
 								break;
 							case 15:
@@ -401,7 +258,7 @@ public class ImportController {
 //									String creationDateS = cell.getStringCellValue().trim();
 //									if(!StringUtils.isEmpty(creationDateS)) {
 //										try {
-//											creationDate = sdf1.parse(creationDateS);
+//											creationDate = sdf.parse(creationDateS);
 //										} catch (Exception e) {}
 //										if(approvalDate == null) {
 //											try {
@@ -421,58 +278,16 @@ public class ImportController {
 								break;
 							case 16:
 								try {
-									customSubscriptionStartDate = cell.getDateCellValue();
+									customSubscriptionStartDate = parseDateValueCell(cell);
 								} catch (Exception e) {
-									log.warn("Cannot read custom subscription start date as date cell");
-								}
-								if(customSubscriptionStartDate == null) {
-									String customSubscriptionStartDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(customSubscriptionStartDateS)) {
-										try {
-											customSubscriptionStartDate = sdf1.parse(customSubscriptionStartDateS);
-										} catch (Exception e) {}
-										if(customSubscriptionStartDate == null) {
-											try {
-												customSubscriptionStartDate = sdf2.parse(customSubscriptionStartDateS);
-											} catch (Exception e) {}
-										}
-										if(customSubscriptionStartDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data inizio abbonamento Custom\n";
-											errors.put(row.getRowNum(), error);
-										}
-									}
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data inizio abbonamento Custom", errors, row);
 								}
 								break;
 							case 17:
 								try {
-									customSubscriptionEndDate = cell.getDateCellValue();
+									customSubscriptionEndDate = parseDateValueCell(cell);
 								} catch (Exception e) {
-									log.warn("Cannot read custom subscription end date as date cell");
-								}
-								if(customSubscriptionEndDate == null) {
-									String customSubscriptionEndDateS = cell.getStringCellValue().trim();
-									if(!StringUtils.isEmpty(customSubscriptionEndDateS)) {
-										try {
-											customSubscriptionEndDate = sdf1.parse(customSubscriptionEndDateS);
-										} catch (Exception e) {}
-										if(customSubscriptionEndDate == null) {
-											try {
-												customSubscriptionEndDate = sdf2.parse(customSubscriptionEndDateS);
-											} catch (Exception e) {}
-										}
-										if(customSubscriptionEndDate == null) {
-											String error = "";
-											if(errors.containsKey(row.getRowNum())) {
-												error = errors.get(row.getRowNum());
-											}
-											error += "Errore nel leggere il campo: Data fine abbonamento Custom\n";
-											errors.put(row.getRowNum(), error);
-										}
-									}
+									errors = manageDateCellErrorMessage(e.getMessage(), "Data fine abbonamento Custom", errors, row);
 								}
 								break;
 							}
@@ -595,7 +410,7 @@ public class ImportController {
 	}
 
 	@Transactional
-	private PersonSaveResult savePerson(Person person, Integer rowNum) throws Exception {
+	PersonSaveResult savePerson(Person person, Integer rowNum) throws Exception {
 
 		Person transientPerson = new Person();
 		PersonSaveResult personSaveResult = PersonSaveResult.UPDATE_CLIMBER;
@@ -654,4 +469,54 @@ public class ImportController {
 
 		return personSaveResult;
 	}
+
+	private Date parseDateValueCell(Cell cell) throws IOException {
+
+		Date date = null;
+		try {
+			date = cell.getDateCellValue();
+		} catch (Exception e) {
+		}
+		if(date == null) {
+			String dateAsString = cell.getStringCellValue().trim();
+			if(!StringUtils.isEmpty(dateAsString)) {
+				try {
+					date = sdf.parse(dateAsString);
+				} catch (Exception e) {}
+				if(date == null) {
+					try {
+						date = sdf2.parse(dateAsString);
+					} catch (Exception e) {}
+				}
+				if(date == null) {
+					throw new IOException("Error readind date ");
+				} else {
+					if ( checkMaxAllowedDate(date) ) {  // 9999-12-31 23:59:59, after this date mysql rise error
+						throw new IOException("Date exceeded max allowed limited 9999-12-31 23:59:59");
+					}
+				}
+			}
+		}
+
+		return date;
+	}
+	
+	
+	private Map<Integer, String> manageDateCellErrorMessage(String message, String cellName, Map<Integer, String> errors, Row row) {
+
+		log.error("Error reading " + cellName + " " + message);
+		String error = "";
+		if(errors.containsKey(row.getRowNum())) {
+			error = errors.get(row.getRowNum());
+		}
+		error += "Errore nel leggere il campo: " + cellName + "\n";
+		errors.put(row.getRowNum(), error);
+		return errors;
+	}
+
+	private boolean checkMaxAllowedDate(Date date) {
+
+		return  date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().compareTo(MAX_ALLOWED_DATE) > 0;
+	}
+
 }
