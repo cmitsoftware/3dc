@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.climbing.domain.Person;
@@ -292,22 +293,13 @@ public class ImportController {
 								break;
 							}
 
-
-							// put subscription
+							// subscriptions
 
 							if (cell.getColumnIndex() >= 18 && !subscriptionTypes.isEmpty()) {
 
 								int typesIndex = cell.getColumnIndex()-18;
-								if (!(typesIndex >= 0  && typesIndex < subscriptionTypes.size())) {
-									String error = "";
-									if(errors.containsKey(row.getRowNum())) {
-										error = errors.get(row.getRowNum());
-									}
-									error += "Il numero di tipi di abbonamenti a sistema non coincide con gli abbonamenti letti.\n";
-									errors.put(row.getRowNum(), error);
-								} else {
+								if (typesIndex >= 0  && typesIndex < subscriptionTypes.size()) {
 									SubscriptionType subscriptionType = subscriptionTypes.get(typesIndex);
-
 									Integer subscriptionReferenceYear = null;
 									if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
 										try {
@@ -340,6 +332,15 @@ public class ImportController {
 									if(subscriptionReferenceYear!=null) {
 										Subscription subscription = subscriptionUtil.buildSubscriptionFromType(subscriptionType, subscriptionReferenceYear);
 										subscriptions.add(subscription);
+									}
+								} else {
+									if ( cell.getCellType() != Cell.CELL_TYPE_BLANK ) {
+										String error = errors.containsKey(row.getRowNum()) ? errors.get(row.getRowNum()) : "";
+										String message = "Il numero di abbonamenti letti non coincide con gli abbonamenti configurati a sistema.";
+										if ( ! error.contains(message)) {
+											error += message + "\n";
+											errors.put(row.getRowNum(), error);
+										}
 									}
 								}
 							}
