@@ -11,7 +11,7 @@
     <name>3d climbing</name>
 
     <properties>
-        <version.spring>4.3.5.RELEASE</version.spring>
+        <version.spring>5.3.18</version.spring>
         <version.spring.security>4.2.1.RELEASE</version.spring.security>
         <version.standard.taglibs>1.1.2</version.standard.taglibs>
         <version.commons.logging>1.1.1</version.commons.logging>
